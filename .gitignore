@@ -1,0 +1,19 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.vscode/
+.idea/
+captures/
+debug_output/
+*.log
+.env
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db

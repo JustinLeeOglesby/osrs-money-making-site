@@ -1,0 +1,27 @@
+# Render Infrastructure-as-Code config for the OSRS Margin Tracker.
+# Push this file to a GitHub repo and connect that repo in Render's dashboard;
+# Render will pick this up and provision the service automatically.
+#
+# Free tier limits to be aware of:
+#   - 750 instance-hours per month (one always-on service uses ~720)
+#   - The service sleeps after 15 min of inactivity, taking ~30 s to wake up
+#   - 0.5 GB RAM
+#
+# All of which is fine for a single-user tool.
+
+services:
+  - type: web
+    name: osrs-margin-tracker
+    runtime: python
+    plan: free
+    # Render only invalidates caches when build/start commands change, so we
+    # cd into frontend for the npm install + build, then come back out.
+    buildCommand: |
+      pip install -r requirements-web.txt
+      cd frontend && npm install && npm run build
+    startCommand: gunicorn osrs_margin_api:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: NODE_VERSION
+        value: 20.11.0

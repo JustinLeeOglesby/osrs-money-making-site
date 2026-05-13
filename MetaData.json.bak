@@ -1,0 +1,3275 @@
+{
+    "MacroSchemaVersion": 3,
+    "Macros": [
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T094225",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Clean Herbs V1",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "Z",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151256",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Unfinished V4",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082146",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (3)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082204",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (4)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082223",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (5)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082302",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (6)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082320",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (7)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082427",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (9)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082446",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (10)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082509",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (11)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T091215",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (45)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082741",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (16)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082803",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (17)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T083048",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (20)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T083109",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (21)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T083130",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (22)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T083155",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (23)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T083225",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (24)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T083256",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (25)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T092846",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (48)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085647",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (27)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085708",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (28)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085731",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (29)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085750",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (30)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085808",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (31)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085827",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (32)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085847",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (33)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085906",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (34)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T085942",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (35)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T090001",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (36)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T090021",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (37)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T091018",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (41)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T091040",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (42)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T091101",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (43)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T091119",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (44)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T091714",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (44)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (42)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Create Unf"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (43)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (41)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (45)"
+                    ]
+                }
+            ],
+            "Name": "Unfinished V2",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T082708",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Clean herbs",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093455",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (49)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093623",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (50)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093646",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (51)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093704",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (52)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093719",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (53)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093739",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (54)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093758",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (55)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093823",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (56)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093848",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (57)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093918",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (59)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093936",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (60)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T093956",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (61)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T094013",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (62)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T094041",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (63)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T095245",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (67)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T095305",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (68)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T095325",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (69)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T095343",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (70)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 0.5,
+            "CreationTime": "20260507T090124",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Create Unf",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120357",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (71)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120418",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (72)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120440",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (73)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120505",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (74)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120528",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (75)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120554",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (76)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120641",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (77)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120704",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (78)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120727",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (79)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120828",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (81)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T120900",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (82)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T121005",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (76)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (79)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (71)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (77)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (82)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (72)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (75)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (74)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (78)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (81)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (73)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (84)"
+                    ]
+                }
+            ],
+            "Name": "Unfinished V3",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T121008",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (84)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T121645",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (85)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T121705",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (86)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T121726",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (87)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T124213",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (88)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T124249",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (89)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150237",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (90)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150256",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (91)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150317",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "End herb 1",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150420",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (93)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150503",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (95)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150540",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (96)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150642",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (98)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150700",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (99)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150720",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (100)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150850",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (101)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150909",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (102)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150929",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (103)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T150954",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (104)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151024",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (105)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151044",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (106)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151108",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (107)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151127",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (108)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151148",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (109)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151404",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (111)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T151425",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (112)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T171236",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (113)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T171258",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (114)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T173846",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (115)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T173905",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (116)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T173925",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (117)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T174817",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (118)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T174834",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (119)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T184938",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (120)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T185003",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (121)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260507T185038",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (122)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T052236",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (123)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T052301",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (124)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T070957",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (125)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T071020",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (126)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T095832",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (127)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T095857",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (128)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T100329",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (129)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T100352",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (130)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T100510",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (132)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T100533",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (133)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T100721",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (3)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (4)"
+                    ]
+                },
+                {
+                    "Acceleration": 1,
+                    "DelayNextScript": 0,
+                    "LoopInterval": 0,
+                    "LoopIterations": 1,
+                    "MacrosToRun": [
+                        "Macro (5)"
+                    ]
+                }
+            ],
+            "Name": "Macro (134)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T101521",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (135)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T101545",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (136)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T102253",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (137)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T102309",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (138)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T102339",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Test Merge",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T102531",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (140)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        },
+        {
+            "Acceleration": 1,
+            "CreationTime": "20260508T105223",
+            "DoNotShowWindowOnFinish": false,
+            "LoopDuration": 0,
+            "LoopInterval": 0,
+            "LoopIterations": 1,
+            "LoopType": "TillLoopNumber",
+            "MergeConfigurations": [
+            ],
+            "Name": "Macro (141)",
+            "RestartPlayer": false,
+            "RestartPlayerAfterMinutes": 60,
+            "Shortcut": "",
+            "StopOnHomeScreen": false
+        }
+    ],
+    "NextMacroId": 142,
+    "Organization": [
+        {
+            "ID": 55,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Clean Herbs V1",
+            "Order": 3,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 97,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Unfinished V4",
+            "Order": 1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 0,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (3)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 1,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (4)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 2,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (5)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 3,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (6)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 4,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (7)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 5,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (9)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 6,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (10)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 7,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (11)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 37,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (45)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 12,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (16)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 13,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (17)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 15,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (20)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 16,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (21)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 17,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (22)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 18,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (23)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 19,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (24)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 20,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (25)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 39,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (48)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 21,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (27)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 22,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (28)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 23,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (29)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 24,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (30)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 25,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (31)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 26,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (32)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 27,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (33)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 28,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (34)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 29,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (35)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 30,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (36)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 31,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (37)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 33,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (41)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 34,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (42)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 35,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (43)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 36,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (44)",
+            "Order": 10,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 38,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Unfinished V2",
+            "Order": 12,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 11,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Clean herbs",
+            "Order": 13,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 41,
+            "IsFolder": true,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Clean herbs folder",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 40,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": false,
+            "Name": "Macro (49)",
+            "Order": -1,
+            "ParentFolder": 41
+        },
+        {
+            "ID": 42,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": false,
+            "Name": "Macro (50)",
+            "Order": -1,
+            "ParentFolder": 41
+        },
+        {
+            "ID": 43,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": false,
+            "Name": "Macro (51)",
+            "Order": -1,
+            "ParentFolder": 41
+        },
+        {
+            "ID": 44,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": false,
+            "Name": "Macro (52)",
+            "Order": -1,
+            "ParentFolder": 41
+        },
+        {
+            "ID": 45,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (53)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 46,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (54)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 47,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (55)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 48,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (56)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 49,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (57)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 50,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (59)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 51,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (60)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 52,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (61)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 53,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (62)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 54,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (63)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 56,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (67)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 57,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (68)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 58,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (69)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 59,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (70)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 32,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Create Unf",
+            "Order": 8,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 60,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (71)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 61,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (72)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 62,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (73)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 63,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (74)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 64,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (75)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 65,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (76)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 66,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (77)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 67,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (78)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 68,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (79)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 70,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (81)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 71,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (82)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 72,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Unfinished V3",
+            "Order": 5,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 73,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (84)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 74,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (85)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 75,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (86)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 76,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (87)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 77,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (88)",
+            "Order": 6,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 78,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (89)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 79,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (90)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 80,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (91)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 81,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "End herb 1",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 82,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (93)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 83,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (95)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 84,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (96)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 85,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (98)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 86,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (99)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 87,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (100)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 88,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (101)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 89,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (102)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 90,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (103)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 91,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (104)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 92,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (105)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 93,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (106)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 94,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (107)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 95,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (108)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 96,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (109)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 98,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (111)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 99,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (112)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 100,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (113)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 101,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (114)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 102,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (115)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 103,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (116)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 104,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (117)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 105,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (118)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 106,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (119)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 107,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (120)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 108,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (121)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 109,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (122)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 110,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (123)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 111,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (124)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 112,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (125)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 113,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (126)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 114,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (127)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 115,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (128)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 116,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (129)",
+            "Order": 2,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 117,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (130)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 118,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (132)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 119,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (133)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 120,
+            "IsFolder": true,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "New folder",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 121,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (134)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 122,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (135)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 123,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (136)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 124,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (137)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 125,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (138)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 126,
+            "IsFolder": true,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "New folder (1)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 127,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Test Merge",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 128,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (140)",
+            "Order": -1,
+            "ParentFolder": -1
+        },
+        {
+            "ID": 129,
+            "IsFolder": false,
+            "IsOpen": false,
+            "IsVisible": true,
+            "Name": "Macro (141)",
+            "Order": -1,
+            "ParentFolder": -1
+        }
+    ],
+    "TabIndex": 0
+}
