@@ -222,6 +222,7 @@ export default function HighAlchTab() {
           </div>
         )}
       </div>
+      <div className="table-scroll">
       <table className="alch-table">
         <thead>
           <tr>
@@ -265,6 +266,7 @@ export default function HighAlchTab() {
           ))}
         </tbody>
       </table>
+      </div>
       {sorted.length > 200 && (
         <div className="alch-footer">
           Showing top 200 of {sorted.length}. Filter to narrow further.

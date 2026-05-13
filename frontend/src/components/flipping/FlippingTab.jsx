@@ -176,6 +176,7 @@ export default function FlippingTab() {
           server-side because their last "current" price is usually stale.
         </div>
       </div>
+      <div className="table-scroll">
       <table className="alch-table">
         <thead>
           <tr>
@@ -219,6 +220,7 @@ export default function FlippingTab() {
           ))}
         </tbody>
       </table>
+      </div>
       {sorted.length > 200 && (
         <div className="alch-footer">
           Showing top 200 of {sorted.length}. Filter to narrow further.

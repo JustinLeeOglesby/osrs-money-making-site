@@ -46,6 +46,7 @@ export default function WatchlistTab() {
           </span>
         )}
       </div>
+      <div className="table-scroll">
       <table className="alch-table watchlist-table">
         <thead>
           <tr>
@@ -132,6 +133,7 @@ export default function WatchlistTab() {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

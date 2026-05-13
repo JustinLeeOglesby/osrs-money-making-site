@@ -2,6 +2,9 @@
   --bg: #15171c; --bg-2: #1f232b; --bg-3: #2a2f3a;
   --border: #2f3540; --text: #e6e8ec; --muted: #8b94a3;
   --accent: #6da7e7; --green: #5ac26b; --red: #d96b6b;
+  /* Vertical offset for elements that should sit below the sticky page
+     header (sidebar, table column headers). Approximates header height. */
+  --header-offset: 110px;
 }
 * { box-sizing: border-box; }
 body {
@@ -31,9 +34,9 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
   border-right: 1px solid var(--border);
   padding: 0.6em 0;
   position: sticky;
-  top: 110px;
+  top: var(--header-offset);
   align-self: start;
-  height: calc(100vh - 110px);
+  height: calc(100vh - var(--header-offset));
   overflow-y: auto;
 }
 .sidebar-section { padding: 0.4em 0; }
@@ -151,11 +154,100 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
 .fav-item-name { flex: 1; font-weight: 500; }
 .content { padding: 1.2em 1.5em 4em; min-width: 0; }
 @media (max-width: 760px) {
-  .layout { grid-template-columns: 1fr; }
+  /* === Layout: sidebar becomes a horizontal scrolling top bar === */
+  .layout { grid-template-columns: 1fr; min-height: 0; }
   .sidebar {
-    position: static; height: auto; max-height: 40vh;
-    border-right: none; border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: auto;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    z-index: 9;
   }
+  .sidebar-section {
+    display: inline-flex;
+    padding: 0;
+    margin: 0;
+    border-top: none;
+  }
+  .sidebar-section + .sidebar-section {
+    border-top: none;
+    border-left: 1px solid var(--border);
+    margin-top: 0;
+  }
+  .sidebar-section-label { display: none; }
+  .nav-item {
+    padding: 0.7em 0.9em;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    font-size: 0.9em;
+  }
+  .nav-item.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--accent);
+  }
+
+  /* === Header: tighter padding, search bar full-width === */
+  header { padding: 0.6em 0.9em; }
+  h1 { font-size: 1em; }
+  .meta { font-size: 0.8em; margin-bottom: 0.4em; }
+  .item-search-bar { max-width: none; }
+
+  /* === Content: less side padding === */
+  .content { padding: 0.8em 0.9em 3em; }
+
+  /* === Recipe rows: hide XP, GP/XP, 4hr limit on phones === */
+  .recipe-summary { grid-template-columns: 1fr 85px 70px; gap: 0.4em; }
+  .recipe-summary > div:nth-child(3),
+  .recipe-summary > div:nth-child(4),
+  .recipe-summary > div:nth-child(5) { display: none; }
+  .recipe { padding: 0.55em 0.7em; }
+  .recipe-inline { font-size: 0.78em; word-break: break-word; white-space: normal; }
+
+  /* === Tables: horizontal scroll wrapper === */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -0.9em; /* let the scroll area bleed to the edge */
+    padding: 0 0.9em;
+  }
+  .alch-table { font-size: 0.85em; }
+  .alch-table th, .alch-table td { padding: 0.4em 0.55em; }
+  .alch-controls { gap: 0.4em; }
+  .alch-note { font-size: 0.78em; padding: 0.5em 0.65em; }
+
+  /* === Modal: full-screen on phones === */
+  .modal-backdrop { padding: 0; align-items: stretch; }
+  .modal-content {
+    border-radius: 0; padding: 1em 0.9em 2em;
+    max-width: 100%; min-height: 100vh; border: none;
+  }
+  .modal-close { top: 0.2em; right: 0.4em; font-size: 1.8em; }
+
+  /* === Buttons: larger tap targets === */
+  .range-btn { padding: 0.45em 0.85em; font-size: 0.85em; }
+  .fav-btn { font-size: 1.2em; padding: 0.1em 0.4em 0.1em 0; }
+
+  /* === Price-history graph keeps its viewBox; just clamp container width === */
+  .price-svg { max-width: 100%; }
+
+  /* === Watchlist: stack columns vertically === */
+  .watchlist-table th, .watchlist-table td { padding: 0.4em 0.5em; }
+  .watchlist-threshold-input { width: 70px; }
+
+  /* === Item search dropdown: full width === */
+  .item-search-bar input { width: 100%; }
+  .item-search-dropdown { max-height: 300px; }
+
+  /* === Body font slightly larger for readability === */
+  body { font-size: 15px; }
 }
 .subcat { margin-bottom: 1.8em; }
 .subcat h2 {
@@ -390,7 +482,10 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
   color: var(--muted); font-size: 0.78em; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.05em;
   cursor: pointer; user-select: none; background: var(--bg-2);
-  position: sticky; top: 0;
+  /* Sticky so the column labels stay visible when scrolling long tables.
+     Offset matches the page header so they sit just below it. */
+  position: sticky; top: var(--header-offset); z-index: 5;
+  box-shadow: 0 1px 0 var(--border);
 }
 .alch-table th:hover { color: var(--text); }
 .alch-table th.sorted { color: var(--accent); }
