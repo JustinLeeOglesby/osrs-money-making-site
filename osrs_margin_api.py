@@ -10,12 +10,23 @@ Endpoints:
 Pair with the React frontend in ./frontend (npm run dev -> http://localhost:5173).
 """
 
+import json as _json
 import os
 import time
 
 import requests
 from flask import Flask, jsonify, request, send_from_directory, abort
 from flask_cors import CORS
+
+# Postgres is optional — only needed for the cross-device sync feature.
+# Falls back gracefully if the driver or DATABASE_URL is missing (sync
+# endpoints will return 503, the rest of the API works unchanged).
+try:
+    import psycopg2  # type: ignore
+    from psycopg2.extras import RealDictCursor  # type: ignore
+except ImportError:  # pragma: no cover - local dev without sync
+    psycopg2 = None
+    RealDictCursor = None
 
 from osrs_herb_margins import (
     BASE_URL,
@@ -1115,6 +1126,132 @@ def get_timeseries(item_id: int):
         return jsonify({"error": f"upstream error: {e}"}), 502
     _ts_cache[key] = (data, now)
     return jsonify(data)
+
+
+# ---------------------------------------------------------------------------
+# Cross-device sync — Postgres-backed key/value store keyed by SHA-256 of a
+# user-chosen passphrase. No accounts; the passphrase is the auth. Backend
+# never sees the plaintext (frontend hashes client-side).
+#
+# Schema (single table):
+#   passphrase_hash  TEXT primary key  (64 hex chars, lower)
+#   data_json        TEXT              (the JSON blob — favorites, lists, etc.)
+#   updated_at       TIMESTAMP
+#
+# Endpoints:
+#   GET  /api/sync/<hash>           → {data, updatedAt} or {data: None, updatedAt: None}
+#   POST /api/sync/<hash> {data}    → {updatedAt}
+# ---------------------------------------------------------------------------
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+_db_schema_initialized = False
+SYNC_MAX_PAYLOAD_BYTES = 1_000_000  # 1 MB — way more than this app will ever need
+
+
+def _sync_enabled() -> bool:
+    return DATABASE_URL is not None and psycopg2 is not None
+
+
+def _open_db():
+    """Open a fresh Postgres connection. Caller closes."""
+    return psycopg2.connect(DATABASE_URL)
+
+
+def _ensure_sync_schema() -> None:
+    global _db_schema_initialized
+    if _db_schema_initialized or not _sync_enabled():
+        return
+    conn = _open_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS sync_data (
+                    passphrase_hash TEXT PRIMARY KEY,
+                    data_json TEXT NOT NULL,
+                    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+            conn.commit()
+        _db_schema_initialized = True
+    finally:
+        conn.close()
+
+
+def _valid_hash(h: str) -> bool:
+    return (
+        isinstance(h, str)
+        and len(h) == 64
+        and all(c in "0123456789abcdef" for c in h.lower())
+    )
+
+
+@app.route("/api/sync/<phash>", methods=["GET"])
+def sync_get(phash: str):
+    if not _valid_hash(phash):
+        return jsonify({"error": "invalid hash format"}), 400
+    if not _sync_enabled():
+        return jsonify({"error": "sync not configured on this server"}), 503
+    _ensure_sync_schema()
+    conn = _open_db()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                "SELECT data_json, updated_at FROM sync_data WHERE passphrase_hash = %s",
+                (phash.lower(),),
+            )
+            row = cur.fetchone()
+    finally:
+        conn.close()
+    if row is None:
+        return jsonify({"data": None, "updatedAt": None})
+    return jsonify(
+        {
+            "data": _json.loads(row["data_json"]),
+            "updatedAt": row["updated_at"].isoformat(),
+        }
+    )
+
+
+@app.route("/api/sync/<phash>", methods=["POST"])
+def sync_post(phash: str):
+    if not _valid_hash(phash):
+        return jsonify({"error": "invalid hash format"}), 400
+    if not _sync_enabled():
+        return jsonify({"error": "sync not configured on this server"}), 503
+    body = request.get_json(silent=True) or {}
+    data = body.get("data")
+    if data is None:
+        return jsonify({"error": "missing data"}), 400
+    payload = _json.dumps(data)
+    if len(payload) > SYNC_MAX_PAYLOAD_BYTES:
+        return jsonify({"error": "data too large"}), 413
+    _ensure_sync_schema()
+    conn = _open_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO sync_data (passphrase_hash, data_json, updated_at)
+                VALUES (%s, %s, CURRENT_TIMESTAMP)
+                ON CONFLICT (passphrase_hash) DO UPDATE
+                SET data_json = EXCLUDED.data_json, updated_at = CURRENT_TIMESTAMP
+                RETURNING updated_at
+                """,
+                (phash.lower(), payload),
+            )
+            updated_at = cur.fetchone()[0]
+            conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"updatedAt": updated_at.isoformat()})
+
+
+@app.route("/api/sync/status")
+def sync_status():
+    """Frontend probe — tells the UI whether sync is available on this server."""
+    return jsonify({"enabled": _sync_enabled()})
 
 
 if SERVE_FRONTEND:

@@ -6,3 +6,6 @@ flask-cors>=4.0.0
 requests>=2.31.0
 openpyxl>=3.1.0
 gunicorn>=21.0.0
+# Cross-device sync (Postgres-backed key/value store keyed by passphrase hash).
+# psycopg2-binary ships a precompiled wheel so Render's build doesn't need a C compiler.
+psycopg2-binary>=2.9.0

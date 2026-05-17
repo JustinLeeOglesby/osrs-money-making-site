@@ -8,6 +8,7 @@ import { GELimitsProvider } from './context/GELimitsContext';
 import { PaceProvider } from './context/PaceContext';
 import { RoguesListProvider } from './context/RoguesListContext';
 import { RoguesLabProvider } from './context/RoguesLabContext';
+import { SyncProvider } from './context/SyncContext';
 import {
   FAVORITES_TAB,
   ALCH_TAB,
@@ -190,6 +191,7 @@ export default function App() {
   );
 
   return (
+    <SyncProvider>
     <ItemFavoritesProvider>
     <RoguesListProvider>
     <RoguesLabProvider>
@@ -262,5 +264,6 @@ export default function App() {
     </RoguesLabProvider>
     </RoguesListProvider>
     </ItemFavoritesProvider>
+    </SyncProvider>
   );
 }

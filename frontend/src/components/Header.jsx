@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import ItemSearchBar from './ItemSearchBar';
+import SyncPanel from './SyncPanel';
 import { usePace } from '../context/PaceContext';
+import { useSync } from '../context/SyncContext';
 import { PACE_PRESETS } from '../utils/constants';
 
-// Top-of-page header: title, metadata, refresh-prices button, pace selector
-// (for gp/hr estimates on recipe rows), and the global item search bar.
+// Top-of-page header: title, metadata, refresh-prices button, sync button,
+// pace selector (for gp/hr estimates on recipe rows), and the global item
+// search bar.
 export default function Header({
   recipeCount,
   strategyLabel,
@@ -11,6 +15,19 @@ export default function Header({
   onRefresh,
 }) {
   const { pace, setPace, actionsPerHour } = usePace();
+  const { available: syncAvailable, passphrase, status } = useSync();
+  const [syncOpen, setSyncOpen] = useState(false);
+
+  const syncLabel = !passphrase
+    ? 'Sync'
+    : status === 'syncing'
+      ? 'Syncing…'
+      : status === 'error'
+        ? 'Sync error'
+        : status === 'conflict'
+          ? 'Sync · choose'
+          : 'Synced';
+
   return (
     <header>
       <h1>
@@ -36,6 +53,16 @@ export default function Header({
         >
           {refreshing ? 'Refreshing…' : 'Refresh prices'}
         </button>
+        {syncAvailable && (
+          <button
+            className="sync-header-btn"
+            onClick={() => setSyncOpen(true)}
+            title={passphrase ? 'Manage cross-device sync' : 'Set up cross-device sync'}
+          >
+            <span className={`sync-header-dot ${status}`} />
+            {syncLabel}
+          </button>
+        )}
       </div>
       <div className="header-controls">
         <ItemSearchBar />
@@ -55,6 +82,7 @@ export default function Header({
           ))}
         </div>
       </div>
+      {syncOpen && <SyncPanel onClose={() => setSyncOpen(false)} />}
     </header>
   );
 }
