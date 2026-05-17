@@ -4,12 +4,22 @@ import { fetchRecipes, refreshRecipes } from './api/client';
 import { ItemModalContext } from './context/ItemModalContext';
 import { WatchlistProvider } from './context/WatchlistContext';
 import { ItemFavoritesProvider } from './context/ItemFavoritesContext';
+import { GELimitsProvider } from './context/GELimitsContext';
+import { PaceProvider } from './context/PaceContext';
+import { RoguesListProvider } from './context/RoguesListContext';
+import { RoguesLabProvider } from './context/RoguesLabContext';
 import {
   FAVORITES_TAB,
   ALCH_TAB,
   FLIPPING_TAB,
   WATCHLIST_TAB,
+  GE_LIMITS_TAB,
+  CHAIN_TAB,
+  SHOPS_TAB,
+  ROGUES_LIST_TAB,
+  ROGUES_LAB_TAB,
   FAVORITES_STORAGE_KEY,
+  tabToSlug,
 } from './utils/constants';
 
 import Header from './components/Header';
@@ -20,6 +30,11 @@ import HighAlchTab from './components/alch/HighAlchTab';
 import FlippingTab from './components/flipping/FlippingTab';
 import WatchlistTab from './components/watchlist/WatchlistTab';
 import FavoritesTab from './components/favorites/FavoritesTab';
+import GELimitsTab from './components/gelimits/GELimitsTab';
+import ChainExplorer from './components/chain/ChainExplorer';
+import ShopsTab from './components/shops/ShopsTab';
+import RoguesListTab from './components/rogueslist/RoguesListTab';
+import RoguesLabTab from './components/rogueslab/RoguesLabTab';
 
 // Composition root. Owns:
 //   - the recipe payload (fetched from /api/recipes)
@@ -91,17 +106,52 @@ export default function App() {
 
   const categories = useMemo(() => [...byCategory.keys()].sort(), [byCategory]);
 
-  // Default to Favorites if any exist, otherwise the first category.
-  // Note: item favorites are in their own provider, so we can't gate on
-  // their count here without subscribing to the context. The recipe-side
-  // check is good enough — users who only have item favorites can still
-  // click into the Favorites tab manually.
+  // All addressable tabs (pinned + dynamic categories) and slug ↔ tab maps.
+  // The maps are used to read the active tab from the URL on load and to
+  // push a new URL whenever the user picks a different tab.
+  const allTabs = useMemo(
+    () => [FAVORITES_TAB, WATCHLIST_TAB, ALCH_TAB, FLIPPING_TAB, GE_LIMITS_TAB, CHAIN_TAB, SHOPS_TAB, ROGUES_LIST_TAB, ROGUES_LAB_TAB, ...categories],
+    [categories]
+  );
+  const slugToTab = useMemo(() => {
+    const m = new Map();
+    for (const t of allTabs) m.set(tabToSlug(t), t);
+    return m;
+  }, [allTabs]);
+
+  // Initial activation: URL wins if it names a real tab, otherwise fall back
+  // to Favorites (if any exist) or the first category.
   useEffect(() => {
-    if (!activeTab) {
-      if (favorites.size > 0) setActiveTab(FAVORITES_TAB);
-      else if (categories.length) setActiveTab(categories[0]);
+    if (activeTab) return;
+    const slug = window.location.pathname.slice(1).split('/')[0];
+    const fromUrl = slug && slugToTab.get(slug);
+    if (fromUrl) {
+      setActiveTab(fromUrl);
+      return;
     }
-  }, [categories, activeTab, favorites]);
+    if (favorites.size > 0) setActiveTab(FAVORITES_TAB);
+    else if (categories.length) setActiveTab(categories[0]);
+  }, [categories, activeTab, favorites, slugToTab]);
+
+  // Push the URL when the user switches tabs, so refresh + back/forward work.
+  useEffect(() => {
+    if (!activeTab) return;
+    const newPath = '/' + tabToSlug(activeTab);
+    if (window.location.pathname !== newPath) {
+      window.history.pushState({}, '', newPath);
+    }
+  }, [activeTab]);
+
+  // Browser back/forward navigation: pull the tab back out of the URL.
+  useEffect(() => {
+    const onPop = () => {
+      const slug = window.location.pathname.slice(1).split('/')[0];
+      const tab = slugToTab.get(slug);
+      if (tab) setActiveTab(tab);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [slugToTab]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -141,6 +191,10 @@ export default function App() {
 
   return (
     <ItemFavoritesProvider>
+    <RoguesListProvider>
+    <RoguesLabProvider>
+    <GELimitsProvider>
+    <PaceProvider>
     <WatchlistProvider>
     <ItemModalContext.Provider value={modalCtx}>
       <Header
@@ -164,6 +218,16 @@ export default function App() {
             <FlippingTab key={FLIPPING_TAB} />
           ) : activeTab === WATCHLIST_TAB ? (
             <WatchlistTab key={WATCHLIST_TAB} />
+          ) : activeTab === GE_LIMITS_TAB ? (
+            <GELimitsTab key={GE_LIMITS_TAB} />
+          ) : activeTab === CHAIN_TAB ? (
+            <ChainExplorer key={CHAIN_TAB} />
+          ) : activeTab === SHOPS_TAB ? (
+            <ShopsTab key={SHOPS_TAB} />
+          ) : activeTab === ROGUES_LIST_TAB ? (
+            <RoguesListTab key={ROGUES_LIST_TAB} />
+          ) : activeTab === ROGUES_LAB_TAB ? (
+            <RoguesLabTab key={ROGUES_LAB_TAB} />
           ) : activeTab === FAVORITES_TAB ? (
             <FavoritesTab
               key={FAVORITES_TAB}
@@ -193,6 +257,10 @@ export default function App() {
       )}
     </ItemModalContext.Provider>
     </WatchlistProvider>
+    </PaceProvider>
+    </GELimitsProvider>
+    </RoguesLabProvider>
+    </RoguesListProvider>
     </ItemFavoritesProvider>
   );
 }

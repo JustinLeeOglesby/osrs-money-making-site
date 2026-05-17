@@ -123,6 +123,7 @@ GRIMY = {
     "Toadflax": 3049,
     "Irit": 209,
     "Avantoe": 211,
+    "Huasca": 30094,
     "Kwuarm": 213,
     "Snapdragon": 3051,
     "Cadantine": 215,
@@ -139,6 +140,7 @@ CLEAN = {
     "Toadflax": 2998,
     "Irit": 259,
     "Avantoe": 261,
+    "Huasca": 30097,
     "Kwuarm": 263,
     "Snapdragon": 3000,
     "Cadantine": 265,
@@ -156,6 +158,7 @@ UNF = {
     "Toadflax": 3002,
     "Irit": 101,
     "Avantoe": 103,
+    "Huasca": 30100,
     "Kwuarm": 105,
     "Snapdragon": 3004,
     "Cadantine": 107,
@@ -208,16 +211,16 @@ LOGS = {
     "Magic": 1513,
 }
 UNSTRUNG_LONGBOW = {
-    "Normal": 50,
+    "Normal": 48,
     "Oak": 56,
-    "Willow": 60,
-    "Maple": 64,
-    "Yew": 68,
-    "Magic": 72,
+    "Willow": 58,
+    "Maple": 62,
+    "Yew": 66,
+    "Magic": 70,
 }
 LONGBOW = {
     "Normal": 839,
-    "Oak": 843,
+    "Oak": 845,
     "Willow": 847,
     "Maple": 851,
     "Yew": 855,
@@ -311,12 +314,14 @@ RECIPES: list[Recipe] = []
 HERB_CLEAN_XP = {
     "Guam": 2.5, "Marrentill": 3.8, "Tarromin": 5.0, "Harralander": 6.3,
     "Ranarr": 7.5, "Toadflax": 8.0, "Irit": 8.8, "Avantoe": 10.0,
+    "Huasca": 11.8,
     "Kwuarm": 11.3, "Snapdragon": 11.8, "Cadantine": 12.5, "Lantadyme": 13.1,
     "Dwarf weed": 13.8, "Torstol": 15.0,
 }
 HERB_LEVEL = {
     "Guam": 3, "Marrentill": 5, "Tarromin": 11, "Harralander": 20,
     "Ranarr": 25, "Toadflax": 30, "Irit": 40, "Avantoe": 48,
+    "Huasca": 58,
     "Kwuarm": 54, "Snapdragon": 59, "Cadantine": 65, "Lantadyme": 67,
     "Dwarf weed": 70, "Torstol": 75,
 }
@@ -572,8 +577,8 @@ RECIPES.append(
 )
 
 # Fletching: Amethyst broad bolts — broad bolts + amethyst bolt tips -> tipped.
-AMETHYST_BOLT_TIPS = 21944
-BROAD_BOLTS = 13280
+AMETHYST_BOLT_TIPS = 21338
+BROAD_BOLTS = 11875
 AMETHYST_BROAD_BOLTS = 21316
 RECIPES.append(
     Recipe(
@@ -592,8 +597,8 @@ RECIPES.append(
 )
 
 # Fletching: Amethyst javelins — javelin shaft + amethyst javelin heads -> javelin.
-JAVELIN_SHAFT = 19592
-AMETHYST_JAVELIN_HEADS = 21358
+JAVELIN_SHAFT = 19584
+AMETHYST_JAVELIN_HEADS = 21352
 AMETHYST_JAVELIN = 21318
 RECIPES.append(
     Recipe(
@@ -602,7 +607,7 @@ RECIPES.append(
         subcategory="Javelins",
         inputs=[
             Ingredient(JAVELIN_SHAFT, "Javelin shaft", 15),
-            Ingredient(AMETHYST_JAVELIN_HEADS, "Amethyst javelin heads", 15),
+            Ingredient(AMETHYST_JAVELIN_HEADS, "Amethyst javelin tips", 15),
         ],
         outputs=[Ingredient(AMETHYST_JAVELIN, "Amethyst javelin", 15)],
         xp=13.5 * 15,
@@ -626,18 +631,61 @@ AMETHYST_CHISEL = [
     ("dart tips",      AMETHYST_DART_TIP,       8, 89),
 ]
 for tip_name, tip_id, yield_qty, lvl in AMETHYST_CHISEL:
+    # Amethyst-javelin "heads" were officially renamed to "tips" Nov 2025 —
+    # match the wiki's current name so the modal display is consistent.
+    wiki_tip_name = tip_name.replace("javelin heads", "javelin tips")
     RECIPES.append(
         Recipe(
             name=f"Chisel amethyst → {tip_name}",
             category="Crafting",
             subcategory="Amethyst chiseling",
             inputs=[Ingredient(AMETHYST, "Amethyst")],
-            outputs=[Ingredient(tip_id, f"Amethyst {tip_name}", yield_qty)],
+            outputs=[Ingredient(tip_id, f"Amethyst {wiki_tip_name}", yield_qty)],
             xp=60.0,
             level_req=f"Crafting {lvl}",
             notes=f"{yield_qty} {tip_name} per amethyst",
         )
     )
+
+# Cooking: Jugs of wine — classic AFK Cooking money method.
+# Grapes + jug of water → unfermented wine → ferments to Jug of wine
+# (or rarely burns into Jug of bad wine; we model the no-burn case).
+GRAPES = 1987
+JUG_OF_WATER = 1937
+JUG_OF_WINE = 1993
+RECIPES.append(
+    Recipe(
+        name="Jug of wine",
+        category="Cooking",
+        subcategory="Wines",
+        inputs=[
+            Ingredient(GRAPES, "Grapes"),
+            Ingredient(JUG_OF_WATER, "Jug of water"),
+        ],
+        outputs=[Ingredient(JUG_OF_WINE, "Jug of wine")],
+        xp=200.0,
+        level_req="Cooking 35",
+        is_f2p=True,
+        notes="Assumes no burns; ferments ~12s after combining",
+    )
+)
+
+# Crafting: Soft clay — clay + water source. F2P, lvl 1, fast click-spam.
+CLAY = 434
+SOFT_CLAY = 1761
+RECIPES.append(
+    Recipe(
+        name="Soft clay",
+        category="Crafting",
+        subcategory="Soft clay",
+        inputs=[Ingredient(CLAY, "Clay")],
+        outputs=[Ingredient(SOFT_CLAY, "Soft clay")],
+        xp=1.0,
+        level_req="Crafting 1",
+        is_f2p=True,
+        notes="Use clay on a water source (sink/fountain); water itself is free",
+    )
+)
 
 # Cooking: raw -> cooked fish
 F2P_COOK_FISH = {"Shrimp", "Trout", "Salmon", "Tuna", "Lobster", "Swordfish", "Shark"}
@@ -652,13 +700,16 @@ COOK_FISH_LEVEL = {
     "Shark": 80, "Anglerfish": 84, "Karambwan": 30,
 }
 for fish in RAW_FISH:
+    # Karambwan is the odd one out — its cooked form is named "Cooked
+    # karambwan" in-game while every other fish just becomes "<Fish>".
+    cooked_name = "Cooked karambwan" if fish == "Karambwan" else fish
     RECIPES.append(
         Recipe(
             name=f"Cook {fish}",
             category="Cooking",
             subcategory="Fish",
             inputs=[Ingredient(RAW_FISH[fish], f"Raw {fish.lower()}")],
-            outputs=[Ingredient(COOKED_FISH[fish], fish)],
+            outputs=[Ingredient(COOKED_FISH[fish], cooked_name)],
             notes="Assumes no burns (high cooking lvl)",
             is_f2p=fish in F2P_COOK_FISH,
             xp=COOK_FISH_XP[fish],
@@ -698,6 +749,211 @@ for bar_name, bar_key, ores, coal_qty, note, smelt_xp, smelt_lvl in BAR_SMELT:
         )
     )
 
+# Smithing: Barrows equipment repair (0 → fully repaired).
+# Wiki formula: anvil cost = NPC cost × (1 - Smithing/200).
+# We assume Smithing 99 (the most common case for repair-flipping): 50.5% of
+# NPC. NPC base costs: helm 60k, body 90k, legs 80k, weapon 100k. So at 99:
+#   helm 30,300 · body 45,450 · legs 40,400 · weapon 50,500
+#
+# Profit logic: buy the broken (0) variant on GE, repair at an anvil with
+# coins, sell the fully repaired item back on GE.
+#
+# Note on IDs: the "broken" item has its own item_id distinct from the
+# tradable/equipped piece. We map broken → fully-repaired below. Some of the
+# broken IDs are guesses extrapolated from Dharok's confirmed block; if any
+# are wrong the wiki API will just skip that recipe (it'll appear in the
+# skipped count).
+BARROWS_PIECE_COSTS_99 = {  # gp at Smithing 99
+    "helm": 30_300,
+    "body": 45_450,
+    "legs": 40_400,
+    "weapon": 50_500,
+}
+
+# (set_name, piece_kind, display_name, broken_id, full_id)
+# Broken IDs verified against each item's Advanced Data on the OSRS wiki.
+BARROWS_REPAIRS = [
+    # Ahrim
+    ("Ahrim",   "helm",   "Ahrim's hood",        4860, 4708),
+    ("Ahrim",   "weapon", "Ahrim's staff",       4866, 4710),
+    ("Ahrim",   "body",   "Ahrim's robetop",     4872, 4712),
+    ("Ahrim",   "legs",   "Ahrim's robeskirt",   4878, 4714),
+    # Dharok
+    ("Dharok",  "helm",   "Dharok's helm",       4884, 4716),
+    ("Dharok",  "weapon", "Dharok's greataxe",   4890, 4718),
+    ("Dharok",  "body",   "Dharok's platebody",  4896, 4720),
+    ("Dharok",  "legs",   "Dharok's platelegs",  4902, 4722),
+    # Guthan
+    ("Guthan",  "helm",   "Guthan's helm",       4908, 4724),
+    ("Guthan",  "weapon", "Guthan's warspear",   4914, 4726),
+    ("Guthan",  "body",   "Guthan's platebody",  4920, 4728),
+    ("Guthan",  "legs",   "Guthan's chainskirt", 4926, 4730),
+    # Karil
+    ("Karil",   "helm",   "Karil's coif",        4932, 4732),
+    ("Karil",   "weapon", "Karil's crossbow",    4938, 4734),
+    ("Karil",   "body",   "Karil's leathertop",  4944, 4736),
+    ("Karil",   "legs",   "Karil's leatherskirt",4950, 4738),
+    # Torag
+    ("Torag",   "helm",   "Torag's helm",        4956, 4745),
+    ("Torag",   "weapon", "Torag's hammers",     4962, 4747),
+    ("Torag",   "body",   "Torag's platebody",   4968, 4749),
+    ("Torag",   "legs",   "Torag's platelegs",   4974, 4751),
+    # Verac
+    ("Verac",   "helm",   "Verac's helm",        4980, 4753),
+    ("Verac",   "weapon", "Verac's flail",       4986, 4755),
+    ("Verac",   "body",   "Verac's brassard",    4992, 4757),
+    ("Verac",   "legs",   "Verac's plateskirt",  4998, 4759),
+]
+for set_name, kind, display, broken_id, full_id in BARROWS_REPAIRS:
+    cost = BARROWS_PIECE_COSTS_99[kind]
+    RECIPES.append(
+        Recipe(
+            name=f"Repair {display}",
+            category="Smithing",
+            subcategory=f"Barrows repair — {set_name}",
+            inputs=[Ingredient(broken_id, f"{display} 0")],
+            outputs=[Ingredient(full_id, display)],
+            extra_cost=cost,
+            level_req="Smithing 99",
+            notes=f"Anvil cost @ Smithing 99 ({cost:,} gp). NPC repair costs ~2x.",
+        )
+    )
+
+# Construction: Hull parts (Sailing/Shipwrights' Workbench). Each piece is 5
+# planks of the matching tier. Large variants are 5 of the regular variant.
+# (display, plank_id, plank_name, output_id, level, xp)
+PLANK = 960
+HULL_PARTS = [
+    ("Wooden hull parts",   PLANK,         "Plank",           32041,  1,  72.5),
+    ("Oak hull parts",      8778,          "Oak plank",       32044,  8, 150.0),
+    ("Teak hull parts",     8780,          "Teak plank",      32047, 23, 225.0),
+    ("Mahogany hull parts", 8782,          "Mahogany plank",  32050, 41, 350.0),
+    ("Camphor hull parts",  31432,         "Camphor plank",   32053, 53, 400.0),
+    ("Ironwood hull parts", 31435,         "Ironwood plank",  32056, 77, 437.5),
+    ("Rosewood hull parts", 31438,         "Rosewood plank",  32059, 84, 475.0),
+]
+for display, plank_id, plank_name, out_id, lvl, xp in HULL_PARTS:
+    RECIPES.append(
+        Recipe(
+            name=display,
+            category="Construction",
+            subcategory="Hull parts",
+            inputs=[Ingredient(plank_id, plank_name, 5)],
+            outputs=[Ingredient(out_id, display)],
+            xp=xp,
+            level_req=f"Construction {lvl}",
+            notes="Shipwrights' Workbench — needs saw + hammer. 5 planks → 1 hull part",
+        )
+    )
+
+# Large hull parts are 5 of the corresponding regular hull part.
+# (display, regular_id, regular_name, output_id, level, xp_estimate)
+LARGE_HULL_PARTS = [
+    ("Large wooden hull parts",   32041, "Wooden hull parts",   32062,  1, 100.0),
+    ("Large oak hull parts",      32044, "Oak hull parts",      32065,  8, 200.0),
+    ("Large teak hull parts",     32047, "Teak hull parts",     32068, 23, 300.0),
+    ("Large mahogany hull parts", 32050, "Mahogany hull parts", 32071, 41, 450.0),
+    ("Large camphor hull parts",  32053, "Camphor hull parts",  32074, 53, 525.0),
+    ("Large ironwood hull parts", 32056, "Ironwood hull parts", 32077, 77, 600.0),
+    ("Large rosewood hull parts", 32059, "Rosewood hull parts", 32080, 84, 650.0),
+]
+for display, reg_id, reg_name, out_id, lvl, xp in LARGE_HULL_PARTS:
+    RECIPES.append(
+        Recipe(
+            name=display,
+            category="Construction",
+            subcategory="Large hull parts",
+            inputs=[Ingredient(reg_id, reg_name, 5)],
+            outputs=[Ingredient(out_id, display)],
+            xp=xp,
+            level_req=f"Construction {lvl}",
+            notes="Shipwrights' Workbench — 5 regular hull parts → 1 large",
+        )
+    )
+
+# Firemaking: Sailing pyre logs — sacred oil(4) + log → pyre log. Used for
+# the Shades of Mort'ton minigame. Bank-standing, fast click-spam.
+SACRED_OIL_4 = 3430
+SAILING_PYRE_LOGS = [
+    # (output_name, log_id, log_name, pyre_id, level, xp_per)
+    ("Camphor pyre logs",  32904, "Camphor logs",  31383, 80, 62.0),
+    ("Ironwood pyre logs", 32907, "Ironwood logs", 31386, 85, 66.0),
+    ("Rosewood pyre logs", 32910, "Rosewood logs", 31389, 95, 72.0),
+]
+for display, log_id, log_name, pyre_id, lvl, fxp in SAILING_PYRE_LOGS:
+    RECIPES.append(
+        Recipe(
+            name=display,
+            category="Firemaking",
+            subcategory="Sailing pyre logs",
+            inputs=[
+                Ingredient(log_id, log_name),
+                Ingredient(SACRED_OIL_4, "Sacred oil(4)"),
+            ],
+            outputs=[Ingredient(pyre_id, display)],
+            xp=fxp,
+            level_req=f"Firemaking {lvl}",
+            notes="Bank-standing — Shades of Mort'ton consumable",
+        )
+    )
+
+# Miscellaneous: consumable crushing (pestle + mortar). No skill requirement,
+# very fast click-spam. Pure GE arbitrage — buy whole, crush, sell dust.
+# (input_id, input_name, output_id, output_name)
+CRUSHING_RECIPES = [
+    (5075,  "Bird nest (empty)",         6693,  "Crushed nest"),
+    (237,   "Unicorn horn",              235,   "Unicorn horn dust"),
+    (9735,  "Goat horn",                 9736,  "Goat horn dust"),
+    (1973,  "Chocolate bar",             1975,  "Chocolate dust"),
+    (22124, "Superior dragon bones",     21975, "Crushed superior dragon bones"),
+]
+for in_id, in_name, out_id, out_name in CRUSHING_RECIPES:
+    RECIPES.append(
+        Recipe(
+            name=f"Crush {in_name.lower()}",
+            category="Miscellaneous",
+            subcategory="Crushing",
+            inputs=[Ingredient(in_id, in_name)],
+            outputs=[Ingredient(out_id, out_name)],
+            notes="Pestle + mortar; no skill requirement — pure GE arbitrage",
+        )
+    )
+
+# Magic: Plank Make (Lunar spell, lvl 86 Magic). Converts logs to planks with
+# a per-cast coin charge plus runes. Bank-standing, very common processing
+# money method. XP is 90 per cast regardless of plank tier; coin cost scales.
+# Camphor/Ironwood/Rosewood are newer Sailing-skill planks.
+# (display, log_id, plank_id, coin_cost)
+PLANK_MAKE_RECIPES = [
+    ("Plank",          1511, 960,     70),
+    ("Oak plank",      1521, 8778,   175),
+    ("Teak plank",     6333, 8780,   350),
+    ("Mahogany plank", 6332, 8782, 1_050),
+    ("Camphor plank",  32904, 31432, 1_750),
+    ("Ironwood plank", 32907, 31435, 3_500),
+    ("Rosewood plank", 32910, 31438, 5_250),
+]
+for display, log_id, plank_id, coin in PLANK_MAKE_RECIPES:
+    log_name = "Logs" if display == "Plank" else display.replace(" plank", " logs")
+    RECIPES.append(
+        Recipe(
+            name=f"Plank Make ({display})",
+            category="Magic",
+            subcategory="Plank Make",
+            inputs=[
+                Ingredient(log_id, log_name),
+                Ingredient(NATURE_RUNE, "Nature rune"),
+                Ingredient(ASTRAL_RUNE, "Astral rune", 2),
+            ],
+            outputs=[Ingredient(plank_id, display)],
+            extra_cost=coin,
+            xp=90.0,
+            level_req="Magic 86",
+            notes="Lunar spellbook; bank-standing — fast and very repeatable",
+        )
+    )
+
+
 # Smithing: bars -> items.
 # Cannonballs are the classic AFK Smithing money method (steel bar + ammo
 # mould near a furnace). Bolts (unfinished), dart tips, and knives are the
@@ -709,7 +965,7 @@ RECIPES.append(
         category="Smithing",
         subcategory="Cannonballs",
         inputs=[Ingredient(BAR["Steel"], "Steel bar")],
-        outputs=[Ingredient(CANNONBALL, "Cannonball", 4)],
+        outputs=[Ingredient(CANNONBALL, "Steel cannonball", 4)],
         xp=25.5,
         level_req="Smithing 35",
         notes="AFK staple — needs ammo mould (not consumed) + Dwarf Cannon quest",
@@ -887,7 +1143,7 @@ RUNE_NAMES = {
 ENCHANT_TARGETS = [
     # Rings -----------------------------------------------------------------
     ("Sapphire",    "Ring", 1637, "Sapphire ring",    2550, "Ring of recoil"),
-    ("Emerald",     "Ring", 1639, "Emerald ring",     2552, "Ring of duelling(8)"),
+    ("Emerald",     "Ring", 1639, "Emerald ring",     2552, "Ring of dueling(8)"),
     ("Ruby",        "Ring", 1641, "Ruby ring",        2568, "Ring of forging"),
     ("Diamond",     "Ring", 1643, "Diamond ring",     2570, "Ring of life"),
     ("Dragonstone", "Ring", 1645, "Dragonstone ring", 2572, "Ring of wealth"),
@@ -897,13 +1153,13 @@ ENCHANT_TARGETS = [
     ("Emerald",     "Amulet", 1696, "Emerald amulet",     1729, "Amulet of defence"),
     ("Ruby",        "Amulet", 1698, "Ruby amulet",        1725, "Amulet of strength"),
     ("Diamond",     "Amulet", 1700, "Diamond amulet",     1731, "Amulet of power"),
-    ("Dragonstone", "Amulet", 1702, "Dragonstone amulet", 1712, "Amulet of glory"),
+    ("Dragonstone", "Amulet", 1702, "Dragonstone amulet", 1712, "Amulet of glory(4)"),
     ("Onyx",        "Amulet", 6581, "Onyx amulet",        6585, "Amulet of fury"),
     # Necklaces -------------------------------------------------------------
     ("Sapphire",    "Necklace", 1656, "Sapphire necklace",    3853,  "Games necklace(8)"),
     ("Emerald",     "Necklace", 1658, "Emerald necklace",     5521,  "Binding necklace"),
     ("Diamond",     "Necklace", 1662, "Diamond necklace",     11090, "Phoenix necklace"),
-    ("Dragonstone", "Necklace", 1664, "Dragonstone necklace", 11105, "Skills necklace"),
+    ("Dragonstone", "Necklace", 1664, "Dragon necklace",      11105, "Skills necklace(4)"),
     ("Onyx",        "Necklace", 6577, "Onyx necklace",        11128, "Berserker necklace"),
 ]
 for gem, piece, in_id, in_name, out_id, out_name in ENCHANT_TARGETS:
@@ -1032,6 +1288,174 @@ for element, orb_id, out_id, lvl, cxp in BATTLESTAVES:
 # margin numbers noisy rather than informative.
 EMPTY_VIAL = 229  # "Vial" — the empty glass vial returned after decanting
 
+# Herblore: combination / processing potions (creation recipes — the
+# combine step, not decanting). These are popular bank-standing methods.
+# Item IDs verified against the wiki.
+CRYSTAL_DUST = 23964
+AMYLASE_CRYSTAL = 12640
+TORSTOL_CLEAN = 269       # also CLEAN["Torstol"]
+WINE_OF_ZAMORAK = 245
+POTATO_CACTUS = 3138
+VIAL_OF_BLOOD = 22446
+CRUSHED_NEST = 6693
+TOADFLAX_UNF = 3002       # also UNF["Toadflax"]
+SUPER_ATTACK_4 = 2436
+SUPER_STRENGTH_4 = 2440
+SUPER_DEFENCE_4 = 2442
+SUPER_COMBAT_4 = 12695
+SUPER_ENERGY_4 = 3016
+RANGING_POTION_4 = 2444
+MAGIC_POTION_4 = 3040
+STAMINA_POTION_4 = 12625
+SARADOMIN_BREW_3 = 6687   # made directly as (3)-dose
+
+# 1) Cadantine blood potion (unf) — used in Bastion and Battlemage potions.
+RECIPES.append(
+    Recipe(
+        name="Cadantine blood potion (unf)",
+        category="Herblore",
+        subcategory="Combination potions — bastion / battlemage",
+        inputs=[
+            Ingredient(CLEAN["Cadantine"], "Clean cadantine"),
+            Ingredient(VIAL_OF_BLOOD, "Vial of blood"),
+        ],
+        outputs=[Ingredient(22443, "Cadantine blood potion (unf)")],
+        xp=0.0,
+        level_req="Herblore 80",
+        notes="Combine clean cadantine with a vial of blood",
+    )
+)
+
+# 2) Bastion potion(3) — Cadantine blood (unf) + wine of zamorak.
+RECIPES.append(
+    Recipe(
+        name="Bastion potion(3)",
+        category="Herblore",
+        subcategory="Combination potions — bastion / battlemage",
+        inputs=[
+            Ingredient(22443, "Cadantine blood potion (unf)"),
+            Ingredient(WINE_OF_ZAMORAK, "Wine of zamorak"),
+        ],
+        outputs=[Ingredient(22464, "Bastion potion(3)")],
+        xp=155.0,
+        level_req="Herblore 80",
+    )
+)
+
+# 3) Battlemage potion(3) — Cadantine blood (unf) + potato cactus.
+RECIPES.append(
+    Recipe(
+        name="Battlemage potion(3)",
+        category="Herblore",
+        subcategory="Combination potions — bastion / battlemage",
+        inputs=[
+            Ingredient(22443, "Cadantine blood potion (unf)"),
+            Ingredient(POTATO_CACTUS, "Potato cactus"),
+        ],
+        outputs=[Ingredient(22454, "Battlemage potion(3)")],
+        xp=155.0,
+        level_req="Herblore 80",
+    )
+)
+
+# 4) Super combat potion(4) — super atk/str/def + torstol.
+RECIPES.append(
+    Recipe(
+        name="Super combat potion(4)",
+        category="Herblore",
+        subcategory="Combination potions — super combat",
+        inputs=[
+            Ingredient(SUPER_ATTACK_4, "Super attack(4)"),
+            Ingredient(SUPER_STRENGTH_4, "Super strength(4)"),
+            Ingredient(SUPER_DEFENCE_4, "Super defence(4)"),
+            Ingredient(TORSTOL_CLEAN, "Torstol"),
+        ],
+        outputs=[Ingredient(SUPER_COMBAT_4, "Super combat potion(4)")],
+        xp=150.0,
+        level_req="Herblore 90",
+        notes="The headline combat-buff potion — most-flipped Herblore combine",
+    )
+)
+
+# 5) Stamina potion(4) — super energy(4) + 4× amylase crystal.
+# (Amylase crystals come from Brimhaven Agility tickets; tradeable on GE.)
+RECIPES.append(
+    Recipe(
+        name="Stamina potion(4)",
+        category="Herblore",
+        subcategory="Combination potions — stamina",
+        inputs=[
+            Ingredient(SUPER_ENERGY_4, "Super energy(4)"),
+            Ingredient(AMYLASE_CRYSTAL, "Amylase crystal", 4),
+        ],
+        outputs=[Ingredient(STAMINA_POTION_4, "Stamina potion(4)")],
+        xp=25.5 * 4,  # 25.5 XP per dose
+        level_req="Herblore 77",
+        notes="Bank-standing; agility-ticket amylase determines profitability",
+    )
+)
+
+# 6) Saradomin brew(3) — toadflax unf + crushed bird nest.
+RECIPES.append(
+    Recipe(
+        name="Saradomin brew(3)",
+        category="Herblore",
+        subcategory="Combination potions — saradomin brew",
+        inputs=[
+            Ingredient(TOADFLAX_UNF, "Toadflax potion (unf)"),
+            Ingredient(CRUSHED_NEST, "Crushed nest"),
+        ],
+        outputs=[Ingredient(SARADOMIN_BREW_3, "Saradomin brew(3)")],
+        xp=180.0,
+        level_req="Herblore 81",
+        notes="Made directly as (3)-dose; decant to (4) for resale",
+    )
+)
+
+# 7) Divine potion creation — super-X potion (4) + 4× crystal dust.
+# Each cast grants only 2 XP regardless of level requirement — these are
+# made for the combat utility, not XP. Crystal dust is from crushing
+# crystal shards 1→10 with a pestle and mortar.
+# (display, super_id, divine_id, herb_level)
+DIVINE_POTIONS = [
+    ("Divine super attack potion(4)",    SUPER_ATTACK_4,    23697, 70),
+    ("Divine super strength potion(4)",  SUPER_STRENGTH_4,  23709, 70),
+    ("Divine super defence potion(4)",   SUPER_DEFENCE_4,   23721, 70),
+    ("Divine ranging potion(4)",         RANGING_POTION_4,  23733, 74),
+    ("Divine magic potion(4)",           MAGIC_POTION_4,    23745, 76),
+    ("Divine super combat potion(4)",    SUPER_COMBAT_4,    23685, 97),
+    ("Divine bastion potion(4)",         22461,             24635, 80),
+    ("Divine battlemage potion(4)",      22451,             24623, 80),
+]
+for display, base_id, divine_id, lvl in DIVINE_POTIONS:
+    base_name = display.replace("Divine ", "").replace(" potion(4)", "(4)")
+    # Heuristic name fix: "Divine super combat" → base "Super combat(4)"
+    if "super combat" in display.lower():
+        base_name = "Super combat potion(4)"
+    elif "bastion" in display.lower():
+        base_name = "Bastion potion(4)"
+    elif "battlemage" in display.lower():
+        base_name = "Battlemage potion(4)"
+    elif "ranging" in display.lower():
+        base_name = "Ranging potion(4)"
+    elif "magic" in display.lower():
+        base_name = "Magic potion(4)"
+    RECIPES.append(
+        Recipe(
+            name=display,
+            category="Herblore",
+            subcategory="Divine potions",
+            inputs=[
+                Ingredient(base_id, base_name),
+                Ingredient(CRYSTAL_DUST, "Crystal dust", 4),
+            ],
+            outputs=[Ingredient(divine_id, display)],
+            xp=2.0,
+            level_req=f"Herblore {lvl}",
+            notes="Crystal dust from crystal shards (Prifddinas / Gauntlet)",
+        )
+    )
+
 # (display_name, {dose: item_id})
 DECANT_POTIONS = [
     ("Prayer potion",       {1: 143,   2: 141,   3: 139,   4: 2434}),
@@ -1049,6 +1473,16 @@ DECANT_POTIONS = [
     ("Super energy",        {1: 3022,  2: 3020,  3: 3018,  4: 3016}),
     ("Energy potion",       {1: 3014,  2: 3012,  3: 3010,  4: 3008}),
     ("Antidote++",          {1: 5958,  2: 5956,  3: 5954,  4: 5952}),
+    # Divine potions — combined from a super-X potion + ancient essence at
+    # high Herblore. Same decant mechanics as any other (n)-dose potion.
+    ("Divine super combat", {1: 23694, 2: 23691, 3: 23688, 4: 23685}),
+    ("Divine super attack", {1: 23706, 2: 23703, 3: 23700, 4: 23697}),
+    ("Divine super strength", {1: 23718, 2: 23715, 3: 23712, 4: 23709}),
+    ("Divine super defence", {1: 23730, 2: 23727, 3: 23724, 4: 23721}),
+    ("Divine ranging",      {1: 23742, 2: 23739, 3: 23736, 4: 23733}),
+    ("Divine magic",        {1: 23754, 2: 23751, 3: 23748, 4: 23745}),
+    ("Divine bastion",      {1: 24644, 2: 24641, 3: 24638, 4: 24635}),
+    ("Divine battlemage",   {1: 24632, 2: 24629, 3: 24626, 4: 24623}),
 ]
 
 # (input_dose, input_qty, output_4dose_qty, vial_returned_qty)
@@ -1168,11 +1602,20 @@ FRUIT_TREE_SAPLINGS = [
     ("Pineapple seed", 5287, "Pineapple sapling", 5500, 51, 57.0),
     ("Papaya tree seed", 5288, "Papaya sapling", 5501, 57, 72.0),
     ("Palm tree seed", 5289, "Palm sapling", 5502, 68, 110.5),
-    ("Dragonfruit tree seed", 22869, "Dragonfruit sapling", 22871, 81, 135.5),
+    ("Dragonfruit tree seed", 22877, "Dragonfruit sapling", 22866, 81, 135.5),
+]
+# Sailing-skill saplings (newer content). Tree-style — pot the seed with a
+# filled plant pot. Farming levels estimated; correct any if/when the wiki
+# audit flags a mismatch.
+SAILING_TREE_SAPLINGS = [
+    ("Camphor seed",  31547, "Camphor sapling",  31502, 83, 150.0),
+    ("Ironwood seed", 31549, "Ironwood sapling", 31505, 90, 165.0),
+    ("Rosewood seed", 31551, "Rosewood sapling", 31508, 95, 180.0),
 ]
 for sap_group, sub in [
     (TREE_SAPLINGS, "Tree saplings"),
     (FRUIT_TREE_SAPLINGS, "Fruit tree saplings"),
+    (SAILING_TREE_SAPLINGS, "Sailing tree saplings"),
 ]:
     for seed_name, seed_id, sap_name, sap_id, lvl, sap_xp in sap_group:
         RECIPES.append(
@@ -1368,6 +1811,46 @@ COMBINATIONS.append(
         level_req="Crafting 59",
     )
 )
+
+# Crystal-infused boots (Cerberus crystal drops, no skill req to combine, irreversible)
+COMBINATIONS.extend([
+    Combination(
+        name="Primordial boots",
+        parts=[
+            Ingredient(11840, "Dragon boots"),
+            Ingredient(13231, "Primordial crystal"),
+        ],
+        whole=Ingredient(13239, "Primordial boots"),
+        notes="Use crystal on boots; no skill required to combine",
+        category="Combination items",
+        subcategory="Crystal-infused boots",
+        splittable=False,
+    ),
+    Combination(
+        name="Pegasian boots",
+        parts=[
+            Ingredient(2577, "Ranger boots"),
+            Ingredient(13229, "Pegasian crystal"),
+        ],
+        whole=Ingredient(13237, "Pegasian boots"),
+        notes="Use crystal on boots; no skill required to combine",
+        category="Combination items",
+        subcategory="Crystal-infused boots",
+        splittable=False,
+    ),
+    Combination(
+        name="Eternal boots",
+        parts=[
+            Ingredient(6920, "Infinity boots"),
+            Ingredient(13227, "Eternal crystal"),
+        ],
+        whole=Ingredient(13235, "Eternal boots"),
+        notes="Use crystal on boots; no skill required to combine",
+        category="Combination items",
+        subcategory="Crystal-infused boots",
+        splittable=False,
+    ),
+])
 
 
 for combo in COMBINATIONS:

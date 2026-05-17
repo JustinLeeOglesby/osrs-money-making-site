@@ -1,5 +1,6 @@
 import { VOLATILITY_THRESHOLD } from '../utils/constants';
 import ItemFavoriteStar from './ItemFavoriteStar';
+import RoguesListToggle from './RoguesListToggle';
 
 // Displays an item name plus a favorite ★ toggle and an inline ⚡
 // volatility badge when its `recentMovePct` field has moved more than the
@@ -14,6 +15,7 @@ export default function ItemNameCell({ row }) {
   return (
     <>
       {row.id != null && <ItemFavoriteStar id={row.id} name={row.name} />}
+      {row.id != null && <RoguesListToggle id={row.id} name={row.name} />}
       {row.name}
       {isVolatile && (
         <span

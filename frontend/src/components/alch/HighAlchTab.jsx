@@ -40,6 +40,7 @@ export default function HighAlchTab() {
   const [members, setMembers] = useState('all');
   const [minProfit, setMinProfit] = useState('');
   const [minVolume, setMinVolume] = useState('');
+  const [maxBuyPrice, setMaxBuyPrice] = useState('');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   // Default sort: "Profit × Volume" — surfaces items that are good on
   // both axes simultaneously, no thresholds needed.
@@ -74,7 +75,11 @@ export default function HighAlchTab() {
     let rows = data.items;
     if (members === 'f2p') rows = rows.filter((r) => !r.members);
     else if (members === 'p2p') rows = rows.filter((r) => r.members);
+    // Mode-specific profitability filter. Backend now includes items
+    // profitable in *either* mode (so we don't pre-exclude rogues-only items),
+    // but each table view should only show items profitable in its mode.
     if (tableMode === 'rogues') rows = rows.filter((r) => r.roguesProfitPerSession > 0);
+    else rows = rows.filter((r) => r.profitPerAlch > 0);
     if (favoritesOnly) rows = rows.filter((r) => favIdSet.has(r.id));
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -92,6 +97,8 @@ export default function HighAlchTab() {
     }
     const minV = parseMin(minVolume);
     if (minV != null) rows = rows.filter((r) => r.hourlyVolume >= minV);
+    const maxBP = parseMin(maxBuyPrice);
+    if (maxBP != null) rows = rows.filter((r) => r.buyPrice <= maxBP);
     const col = columns.find((c) => c.key === sortKey);
     if (col) {
       rows = [...rows].sort((a, b) => {
@@ -103,7 +110,7 @@ export default function HighAlchTab() {
       });
     }
     return rows;
-  }, [data, query, sortKey, sortDir, members, tableMode, columns, minProfit, minVolume, favoritesOnly, favIdSet]);
+  }, [data, query, sortKey, sortDir, members, tableMode, columns, minProfit, minVolume, maxBuyPrice, favoritesOnly, favIdSet]);
 
   const toggleSort = (key) => {
     if (sortKey === key) {
@@ -130,7 +137,7 @@ export default function HighAlchTab() {
             </>
           ) : (
             <>
-              {data.count.toLocaleString()} items currently profitable to alch ·
+              {sorted.length.toLocaleString()} items currently profitable to alch ·
               Nature rune: <strong>{fmtGp(data.natureRunePrice)}</strong>
             </>
           )}
@@ -200,6 +207,16 @@ export default function HighAlchTab() {
               inputMode="numeric"
             />
           </label>
+          <label className="min-filter">
+            Max buy price:
+            <input
+              type="text"
+              value={maxBuyPrice}
+              onChange={(e) => setMaxBuyPrice(e.target.value)}
+              placeholder="—"
+              inputMode="numeric"
+            />
+          </label>
           <button className="range-btn" onClick={load} disabled={refreshing}>
             {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
@@ -207,11 +224,17 @@ export default function HighAlchTab() {
         {tableMode === 'rogues' ? (
           <div className="alch-note">
             💡 Martin Thwait's Lost and Found pays <strong>100% high alch</strong> on
-            sale 1, drops <strong>2% per sale</strong>, floors at <strong>60%</strong>.
-            "Sells / session" is how many you can dump before the shop pays less than
-            you bought for. <strong>"+"</strong> means the floor price still profits, so
-            you can sell unlimited (limited by GE buy limit). No nature rune cost — so
-            cheap items with low GE buy beat straight alching.
+            sale 1, drops <strong>2% per item sold</strong>, floors at{' '}
+            <strong>60%</strong>. You can only sell in batches of 5/10/50, so
+            "Sells / session" is always a multiple of 5. The optimizer maximises
+            gp/<em>hour</em> while only recommending N where{' '}
+            <strong>every individual sale is still profitable</strong>.
+            <br />
+            <strong>"Last sale"</strong> = margin of the Nth (final) sale — if
+            this is positive, the recommendation isn't selling at a loss.{' '}
+            <strong>"Floor (info)"</strong> = margin if you kept selling past
+            sale 20 to the price floor (informational only; the recommendation
+            never reaches floor unless the floor itself is still profitable).
           </div>
         ) : (
           <div className="alch-note">

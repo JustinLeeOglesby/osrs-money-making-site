@@ -5,10 +5,40 @@ export const FAVORITES_TAB = '★ Favorites';
 export const ALCH_TAB = '🔥 High alch';
 export const FLIPPING_TAB = '💰 Flipping';
 export const WATCHLIST_TAB = '👁 Watchlist';
+export const GE_LIMITS_TAB = '📅 GE limits';
+export const CHAIN_TAB = '🔗 Chain explorer';
+export const SHOPS_TAB = '🏪 Shop trades';
+export const ROGUES_LIST_TAB = '🎒 Rogues’ list';
+export const ROGUES_LAB_TAB = '🧪 Rogues’ lab';
+
+// Rogues' Den 27-slot tracker. 28th inventory slot is the coin pile, so the
+// usable shopping list is exactly 27 items.
+export const ROGUES_LIST_MAX = 27;
+export const ROGUES_LIST_STORAGE_KEY = 'osrs-margin-rogues-list';
+export const ROGUES_LAB_STORAGE_KEY = 'osrs-margin-rogues-lab-picks';
+// Items with hourly volume below this are flagged as "thin liquidity" so the
+// user can spot rec'd picks that look juicy on paper but won't fill.
+export const ROGUES_VOLUME_FLOOR = 100;
+
+// GE buy-limit reset window in milliseconds.
+export const GE_LIMIT_WINDOW_MS = 4 * 60 * 60 * 1000;
+
+// Pace presets: how many recipe "actions" (one full inventory worth of
+// processing, banking included) the user typically completes per hour.
+// Used to convert per-craft profit into a realistic gp/hour figure.
+export const PACE_PRESETS = [
+  { key: 'afk',     label: 'AFK',     actionsPerHour: 300 },
+  { key: 'steady',  label: 'Steady',  actionsPerHour: 1200 },
+  { key: 'focused', label: 'Focused', actionsPerHour: 2000 },
+  { key: 'max',     label: 'Max',     actionsPerHour: 3000 },
+];
+export const DEFAULT_PACE = 'steady';
 
 export const FAVORITES_STORAGE_KEY = 'osrs-margin-favorites';
 export const ITEM_FAVORITES_STORAGE_KEY = 'osrs-margin-item-favorites';
 export const WATCHLIST_STORAGE_KEY = 'osrs-margin-watchlist';
+export const GE_LIMITS_STORAGE_KEY = 'osrs-margin-ge-limits';
+export const PACE_STORAGE_KEY = 'osrs-margin-pace';
 
 // Price-position thresholds (24h range). Lower 25% = "low" band; upper 25% = "high".
 export const PRICE_POSITION_LOW = 0.25;
@@ -17,6 +47,14 @@ export const PRICE_POSITION_HIGH = 0.75;
 // Watchlist polling interval (ms). 60s is a balance: alerts fire promptly
 // without hammering the wiki's caches.
 export const WATCHLIST_POLL_MS = 60_000;
+
+// URL-safe slug for a tab name. Strips emojis / punctuation and lowercases.
+// Examples: "★ Favorites" → "favorites", "🔥 High alch" → "high-alch".
+export const tabToSlug = (tab) =>
+  tab
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 
 // Volatility threshold for showing the ⚡ indicator. Items whose insta-buy
 // price has moved more than VOLATILITY_THRESHOLD% vs the last hour's avg

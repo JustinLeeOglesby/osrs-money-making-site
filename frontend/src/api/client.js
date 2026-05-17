@@ -15,3 +15,4 @@ export const fetchHighAlch = () => getJSON('/api/highalch');
 export const fetchFlipping = () => getJSON('/api/flipping');
 export const fetchTimeseries = (itemId, timestep) =>
   getJSON(`/api/timeseries/${itemId}?timestep=${timestep}`);
+export const fetchShops = () => getJSON('/api/shops');

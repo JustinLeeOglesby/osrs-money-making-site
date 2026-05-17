@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useItemFavorites } from '../../context/ItemFavoritesContext';
 import { useItemModal } from '../../context/ItemModalContext';
 import ItemFavoriteStar from '../ItemFavoriteStar';
@@ -10,6 +11,7 @@ import TabContent from '../recipes/TabContent';
 export default function FavoritesTab({ recipes, favorites, onToggleFavorite }) {
   const { items: favItems } = useItemFavorites();
   const { open: openItemModal } = useItemModal();
+  const [itemsOpen, setItemsOpen] = useState(true);
 
   const hasItems = favItems.length > 0;
   const hasRecipes = recipes.length > 0;
@@ -25,26 +27,38 @@ export default function FavoritesTab({ recipes, favorites, onToggleFavorite }) {
   return (
     <div className="favorites-tab">
       {hasItems && (
-        <div className="subcat">
-          <h2>Items ({favItems.length})</h2>
-          <div className="notes" style={{ marginBottom: '0.5em' }}>
-            For live prices and the full High Alch row format, use the
-            "★ Favorites only" filter on the 🔥 High alch tab.
-          </div>
-          <div className="fav-items">
-            {favItems.map((it) => (
-              <div
-                key={it.id}
-                className="fav-item-row"
-                onClick={() => openItemModal(it.id)}
-                title="Open item details"
-              >
-                <ItemFavoriteStar id={it.id} name={it.name} />
-                <span className="fav-item-name">{it.name}</span>
-                <span className="item-row-id">id {it.id}</span>
+        <div className={`subcat ${itemsOpen ? '' : 'collapsed'}`}>
+          <h2
+            className="subcat-header"
+            onClick={() => setItemsOpen((v) => !v)}
+            title={itemsOpen ? 'Collapse section' : 'Expand section'}
+          >
+            <span className="caret">{itemsOpen ? '▾' : '▸'}</span>
+            Items{' '}
+            <span className="subcat-count">({favItems.length})</span>
+          </h2>
+          {itemsOpen && (
+            <>
+              <div className="notes" style={{ marginBottom: '0.5em' }}>
+                For live prices and the full High Alch row format, use the
+                "★ Favorites only" filter on the 🔥 High alch tab.
               </div>
-            ))}
-          </div>
+              <div className="fav-items">
+                {favItems.map((it) => (
+                  <div
+                    key={it.id}
+                    className="fav-item-row"
+                    onClick={() => openItemModal(it.id)}
+                    title="Open item details"
+                  >
+                    <ItemFavoriteStar id={it.id} name={it.name} />
+                    <span className="fav-item-name">{it.name}</span>
+                    <span className="item-row-id">id {it.id}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
       {hasRecipes && (

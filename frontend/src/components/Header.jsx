@@ -1,13 +1,16 @@
 import ItemSearchBar from './ItemSearchBar';
+import { usePace } from '../context/PaceContext';
+import { PACE_PRESETS } from '../utils/constants';
 
-// Top-of-page header: title, metadata, refresh-prices button, and the
-// global item search bar (replaces the old recipe-search input).
+// Top-of-page header: title, metadata, refresh-prices button, pace selector
+// (for gp/hr estimates on recipe rows), and the global item search bar.
 export default function Header({
   recipeCount,
   strategyLabel,
   refreshing,
   onRefresh,
 }) {
+  const { pace, setPace, actionsPerHour } = usePace();
   return (
     <header>
       <h1>
@@ -34,7 +37,24 @@ export default function Header({
           {refreshing ? 'Refreshing…' : 'Refresh prices'}
         </button>
       </div>
-      <ItemSearchBar />
+      <div className="header-controls">
+        <ItemSearchBar />
+        <div
+          className="pace-selector"
+          title={`Crafts per hour for the gp/hr estimate (currently ~${actionsPerHour}/hr)`}
+        >
+          <span className="pace-label">Pace:</span>
+          {PACE_PRESETS.map((p) => (
+            <button
+              key={p.key}
+              className={`range-btn ${pace === p.key ? 'active' : ''}`}
+              onClick={() => setPace(p.key)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </header>
   );
 }

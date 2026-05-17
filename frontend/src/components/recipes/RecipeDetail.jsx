@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import { fmtGp, profitColor } from '../../utils/format';
 import { useItemModal } from '../../context/ItemModalContext';
+import { usePace } from '../../context/PaceContext';
 import DetailLine from './DetailLine';
 import PriceGraph from '../PriceGraph';
 import RecipeChain from './RecipeChain';
+import ShoppingList from './ShoppingList';
 
 // Expanded recipe panel: per-line buy + sell breakdown, totals, profit,
 // XP, buy-limit data, notes, and a price-history graph for any item in
@@ -104,6 +106,7 @@ export default function RecipeDetail({ r }) {
         </div>
       )}
       <RecipeChain chain={r.chainSources} />
+      <ShoppingList recipe={r} />
       {chartableItems.length > 0 && (
         <div className="detail-section graph-section">
           <div className="detail-label">Price history</div>

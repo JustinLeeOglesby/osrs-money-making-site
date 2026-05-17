@@ -3,6 +3,7 @@ import { fmtGp, profitColor } from '../../utils/format';
 import { fetchItem, fetchTimeseries } from '../../api/client';
 import { PRICE_POSITION_LOW, PRICE_POSITION_HIGH } from '../../utils/constants';
 import { useWatchlist } from '../../context/WatchlistContext';
+import { useGELimits, msRemaining, isReady } from '../../context/GELimitsContext';
 import ItemNameCell from '../ItemNameCell';
 import PriceGraph from '../PriceGraph';
 
@@ -29,6 +30,16 @@ function pricePosition(points, currentHigh) {
   return { pct, band, min, max };
 }
 
+// Compact "Xh Ym" formatter for the GE-limit countdown.
+function formatMsShort(ms) {
+  if (ms <= 0) return '0m';
+  const totalMin = Math.ceil(ms / 60_000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m}m`;
+  return `${h}h ${m}m`;
+}
+
 function PricePositionBadge({ position }) {
   if (!position || position.band === 'mid') return null;
   const isLow = position.band === 'low';
@@ -52,6 +63,7 @@ export default function ItemDetail({ itemId }) {
   const [error, setError] = useState(null);
   const [timeseries, setTimeseries] = useState(null);
   const { isWatched, add, remove } = useWatchlist();
+  const geLimits = useGELimits();
 
   useEffect(() => {
     setInfo(null);
@@ -79,6 +91,22 @@ export default function ItemDetail({ itemId }) {
     else add(info.id, info.name);
   };
 
+  // GE buy-limit tracker — show "Mark limit hit" / "Ready in Xh Ym" / "Ready!"
+  // depending on the entry's state.
+  const limitEntry = geLimits.entries.find((e) => e.id === info.id);
+  const limitTracked = !!limitEntry;
+  const limitReady = limitTracked && isReady(limitEntry, geLimits.now);
+  const limitMsLeft = limitTracked ? msRemaining(limitEntry, geLimits.now) : null;
+  const limitLabel = !limitTracked
+    ? '📅 Mark buy limit hit'
+    : limitReady
+      ? '✅ Limit ready'
+      : `⏳ Ready in ${formatMsShort(limitMsLeft)}`;
+  const onLimitClick = () => {
+    if (!limitTracked || limitReady) geLimits.mark(info.id, info.name);
+    else geLimits.clear(info.id);
+  };
+
   const position = pricePosition(timeseries, info.high);
 
   return (
@@ -103,13 +131,28 @@ export default function ItemDetail({ itemId }) {
           </h2>
           {info.examine && <div className="item-examine">{info.examine}</div>}
         </div>
-        <button
-          className={`range-btn watch-btn ${watched ? 'active' : ''}`}
-          onClick={toggleWatch}
-          title={watched ? 'Stop watching this item' : 'Add to watchlist'}
-        >
-          {watched ? '👁 Watching' : '👁 Watch'}
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4em', flexShrink: 0 }}>
+          <button
+            className={`range-btn watch-btn ${watched ? 'active' : ''}`}
+            onClick={toggleWatch}
+            title={watched ? 'Stop watching this item' : 'Add to watchlist'}
+          >
+            {watched ? '👁 Watching' : '👁 Watch'}
+          </button>
+          <button
+            className={`range-btn ${limitReady ? 'active' : ''}`}
+            onClick={onLimitClick}
+            title={
+              !limitTracked
+                ? 'Start a 4-hour timer for the GE buy limit on this item'
+                : limitReady
+                  ? 'Click to restart the 4-hour timer'
+                  : 'Click to clear this timer'
+            }
+          >
+            {limitLabel}
+          </button>
+        </div>
       </div>
 
       <div className="item-stats">

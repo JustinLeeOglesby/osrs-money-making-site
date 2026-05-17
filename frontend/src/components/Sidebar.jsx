@@ -3,9 +3,18 @@ import {
   ALCH_TAB,
   FLIPPING_TAB,
   WATCHLIST_TAB,
+  GE_LIMITS_TAB,
+  CHAIN_TAB,
+  SHOPS_TAB,
+  ROGUES_LIST_TAB,
+  ROGUES_LAB_TAB,
+  ROGUES_LIST_MAX,
 } from '../utils/constants';
 import { useWatchlist } from '../context/WatchlistContext';
 import { useItemFavorites } from '../context/ItemFavoritesContext';
+import { useGELimits, isReady } from '../context/GELimitsContext';
+import { useRoguesList } from '../context/RoguesListContext';
+import { useRoguesLab } from '../context/RoguesLabContext';
 
 // Left-nav sidebar. "Pinned" section holds the always-available special
 // tabs (favorites / item search / high alch); "Categories" holds the
@@ -20,12 +29,18 @@ export default function Sidebar({
 }) {
   const { items: watchedItems, alerts } = useWatchlist();
   const { items: favItems } = useItemFavorites();
+  const { entries: geLimitEntries, now: geLimitsNow } = useGELimits();
+  const { count: roguesCount } = useRoguesList();
+  const { count: labCount } = useRoguesLab();
   // Combined favorites count (recipes + items) for the nav badge.
   const totalFavorites = favoritesCount + favItems.length;
   // Count entries that have at least one fired alert key.
   const alertCount = new Set(
     [...alerts].map((k) => k.split(':')[0])
   ).size;
+  // Number of GE limit timers that have rolled over to "ready" — shown as
+  // a red badge so the user knows they can re-buy.
+  const readyCount = geLimitEntries.filter((e) => isReady(e, geLimitsNow)).length;
 
   return (
     <nav className="sidebar">
@@ -53,6 +68,35 @@ export default function Sidebar({
           label={FLIPPING_TAB}
           active={FLIPPING_TAB === activeTab}
           onClick={() => onSelectTab(FLIPPING_TAB)}
+        />
+        <NavItem
+          label={GE_LIMITS_TAB}
+          count={geLimitEntries.length}
+          badge={readyCount > 0 ? readyCount : null}
+          active={GE_LIMITS_TAB === activeTab}
+          onClick={() => onSelectTab(GE_LIMITS_TAB)}
+        />
+        <NavItem
+          label={CHAIN_TAB}
+          active={CHAIN_TAB === activeTab}
+          onClick={() => onSelectTab(CHAIN_TAB)}
+        />
+        <NavItem
+          label={SHOPS_TAB}
+          active={SHOPS_TAB === activeTab}
+          onClick={() => onSelectTab(SHOPS_TAB)}
+        />
+        <NavItem
+          label={ROGUES_LIST_TAB}
+          count={roguesCount > 0 ? `${roguesCount}/${ROGUES_LIST_MAX}` : null}
+          active={ROGUES_LIST_TAB === activeTab}
+          onClick={() => onSelectTab(ROGUES_LIST_TAB)}
+        />
+        <NavItem
+          label={ROGUES_LAB_TAB}
+          count={labCount > 0 ? labCount : null}
+          active={ROGUES_LAB_TAB === activeTab}
+          onClick={() => onSelectTab(ROGUES_LAB_TAB)}
         />
       </div>
       <div className="sidebar-section">

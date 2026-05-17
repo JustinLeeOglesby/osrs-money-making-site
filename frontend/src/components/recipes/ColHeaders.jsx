@@ -5,6 +5,7 @@ export default function ColHeaders() {
       <div className="recipe-summary">
         <div className="recipe-name">Recipe</div>
         <div>Profit</div>
+        <div>GP / hr</div>
         <div>XP</div>
         <div>GP / XP</div>
         <div>4hr limit</div>

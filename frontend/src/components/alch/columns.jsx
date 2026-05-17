@@ -91,10 +91,25 @@ export const ROGUES_COLUMNS = [
     profit: true,
   },
   {
+    key: 'roguesLastSaleMargin',
+    label: 'Last sale',
+    sortBy: (r) => r.roguesLastSaleMargin ?? 0,
+    format: (r) =>
+      r.roguesLastSaleMargin != null ? fmtGp(r.roguesLastSaleMargin) : '—',
+    profit: true,
+  },
+  {
     key: 'roguesFloorMargin',
-    label: 'Floor margin',
+    label: 'Floor (info)',
     sortBy: (r) => r.roguesFloorMargin,
     format: (r) => fmtGp(r.roguesFloorMargin),
+    profit: true,
+  },
+  {
+    key: 'roguesGpPerHr',
+    label: 'GP / hr (optimal)',
+    sortBy: (r) => r.roguesGpPerHr ?? 0,
+    format: (r) => (r.roguesGpPerHr ? fmtGp(r.roguesGpPerHr) : '—'),
     profit: true,
   },
   { key: 'limit', label: 'GE limit', sortBy: (r) => r.limit ?? -1, format: (r) => (r.limit != null ? r.limit.toLocaleString() : '—') },

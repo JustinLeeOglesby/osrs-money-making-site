@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { fmtGp } from '../../utils/format';
+import { usePace } from '../../context/PaceContext';
 import RecipeDetail from './RecipeDetail';
 
 // Single recipe row. Collapsed shows: name + level chip, profit, XP,
@@ -8,6 +9,7 @@ import RecipeDetail from './RecipeDetail';
 // toggles favorites without expanding the row.
 export default function Recipe({ r, isFavorite, onToggleFavorite }) {
   const [open, setOpen] = useState(false);
+  const { actionsPerHour } = usePace();
   const klass = r.profit > 0 ? 'pos' : r.profit < 0 ? 'neg' : '';
 
   const lineStr = (l) =>
@@ -25,6 +27,13 @@ export default function Recipe({ r, isFavorite, onToggleFavorite }) {
       : '—';
   // Mark very low volume as a warning — recipe might be a paper profit.
   const lowVolume = r.outputHourlyVolume != null && r.outputHourlyVolume < 10;
+  // Realistic gp/hr at the user's chosen pace. Capped by GE buy limit when
+  // present — you can't actually craft more per 4 hours than the limit.
+  const hourlyActions = r.buyLimit != null
+    ? Math.min(actionsPerHour, r.buyLimit / 4)
+    : actionsPerHour;
+  const gpHr = Math.round(r.profit * hourlyActions);
+  const gpHrStr = fmtGp(gpHr);
 
   return (
     <>
@@ -46,6 +55,14 @@ export default function Recipe({ r, isFavorite, onToggleFavorite }) {
             {r.levelReq && <span className="level-chip">{r.levelReq}</span>}
           </div>
           <div className="recipe-profit">{fmtGp(r.profit)}</div>
+          <div
+            className="recipe-gphr"
+            title={`Realistic gp/hr at your pace setting${
+              r.buyLimit != null ? ' (capped by 4hr GE buy limit)' : ''
+            }`}
+          >
+            {gpHrStr}
+          </div>
           <div>{xpStr}</div>
           <div>{gpXpStr}</div>
           <div>{limitStr}</div>
