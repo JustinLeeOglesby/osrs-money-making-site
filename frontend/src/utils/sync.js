@@ -18,6 +18,7 @@ import {
   PACE_STORAGE_KEY,
   ROGUES_LIST_STORAGE_KEY,
   ROGUES_LAB_STORAGE_KEY,
+  ROGUES_LAB_SETTINGS_KEY,
 } from './constants';
 
 export const SYNC_PASSPHRASE_KEY = 'osrs-margin-sync-passphrase';
@@ -34,6 +35,7 @@ export const SYNCED_KEYS = [
   PACE_STORAGE_KEY,
   ROGUES_LIST_STORAGE_KEY,
   ROGUES_LAB_STORAGE_KEY,
+  ROGUES_LAB_SETTINGS_KEY,
 ];
 
 // SHA-256 → 64 hex chars. Web Crypto API, available in all modern browsers

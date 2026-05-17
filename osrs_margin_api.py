@@ -729,39 +729,110 @@ def high_alch():
         else:
             spread_pct = None
 
-        # Suggested phase: which mode actually makes sense for this item?
-        #   - If neither phase is profitable: None
-        #   - If only one is profitable: that one
-        #   - If both: lean Phase B when B's profit/session beats A by ≥30%
-        #     (the patience premium is worth the wait); otherwise prefer A
-        #     (insta-buy is faster within the active session).
+        # Phase C — limit-cadence cycling. Items that fill near-instantly at
+        # the insta-buy price (same buy price as Phase A) but where the GE
+        # 4-hour buy limit, not market volume, is the binding constraint.
+        # The user logs in every ~4 hours to refresh inventory up to the
+        # limit, cycles via Rogues' Den, logs out.
+        #
+        # Daily ceiling = 4 cycles × limit × avg-profit-per-item (at Phase A
+        # buy price, optimal N). This is *independent* of how many hours the
+        # user is active — they hit the limit fast and then have to wait.
+        phase_c_buy_price = phase_a_buy_price
+        if (
+            limit
+            and phase_a["sellsPerSession"] > 0
+            and phase_a["profitPerSession"] > 0
+        ):
+            phase_a_avg_profit_per_item = (
+                phase_a["profitPerSession"] / phase_a["sellsPerSession"]
+            )
+            phase_c_items_per_cycle = limit
+            phase_c_profit_per_cycle = int(round(phase_a_avg_profit_per_item * limit))
+            phase_c_daily_profit = phase_c_profit_per_cycle * 4
+        else:
+            phase_c_items_per_cycle = None
+            phase_c_profit_per_cycle = None
+            phase_c_daily_profit = None
+
+        # Suggested phase: which strategy makes the most sense for this item?
+        # Decision is based on daily profit, assuming a default active window
+        # of 1 hour/day server-side (the lab tab re-classifies client-side
+        # using the user's actual `hoursActive` setting).
+        #
+        # Three options compared:
+        #   - Phase A daily = realistic_gp_per_hr × 1h (volume-bound active cycling)
+        #   - Phase B daily = phase_b_realistic_gp_per_hr × 1h (patient-offer + active selling)
+        #   - Phase C daily = 4 × limit × avg-profit-per-item (limit-bound, time-independent)
+        #
+        # Phase C "wins" against A when limit binds before volume does. Phase B
+        # wins when its patience premium exceeds the active model by ≥30%.
+        DEFAULT_HOURS_ACTIVE = 1
         suggested_phase = None
         suggested_phase_reason = None
-        a_profitable = phase_a["profitPerSession"] > 0
-        b_profitable = phase_b is not None and phase_b["profitPerSession"] > 0
-        if a_profitable and b_profitable:
-            a_profit = phase_a["profitPerSession"]
-            b_profit = phase_b["profitPerSession"]
-            if b_profit >= a_profit * 1.30:
-                suggested_phase = "B"
-                gain_pct = round((b_profit / a_profit - 1) * 100)
-                suggested_phase_reason = (
-                    f"Patient offer captures +{gain_pct}% more profit/session vs insta-buy"
-                )
-            elif spread_pct is not None and spread_pct < 3:
-                suggested_phase = "A"
-                suggested_phase_reason = (
-                    f"Spread is tight ({spread_pct}%) — no patience premium worth waiting for"
+        phase_a_daily = realistic_gp_per_hr * DEFAULT_HOURS_ACTIVE
+        phase_b_daily = (
+            phase_b_realistic_gp_per_hr * DEFAULT_HOURS_ACTIVE
+            if phase_b_realistic_gp_per_hr
+            else 0
+        )
+        phase_c_daily = phase_c_daily_profit or 0
+
+        # The active-cycling outcome is constrained by whichever ceiling
+        # binds first: Phase A's market-volume ceiling or Phase C's GE-limit
+        # ceiling. They're the same strategy (insta-buy active cycling) with
+        # different limiting factors — we use the lower one as the achievable
+        # daily profit and label the item accordingly.
+        if phase_a_daily > 0 and phase_c_daily > 0:
+            if phase_c_daily < phase_a_daily:
+                active_daily = phase_c_daily
+                active_phase = "C"
+                active_reason = (
+                    f"GE 4hr buy limit ({limit}/cycle) binds before market volume; "
+                    f"cycle on the 4-hour cadence"
                 )
             else:
-                suggested_phase = "A"
+                active_daily = phase_a_daily
+                active_phase = "A"
+                active_reason = "Volume-bound active cycling at insta-buy price"
+        elif phase_c_daily > 0:
+            # No usable volume data, but we know the GE limit and the item
+            # is profitable per session → fall back to Phase C estimation.
+            active_daily = phase_c_daily
+            active_phase = "C"
+            active_reason = (
+                f"Limit-cadence cycling ({limit}/cycle, 4× daily); volume data sparse"
+            )
+        elif phase_a_daily > 0:
+            active_daily = phase_a_daily
+            active_phase = "A"
+            active_reason = "Volume-bound active cycling at insta-buy price"
+        else:
+            active_daily = 0
+            active_phase = None
+            active_reason = None
+
+        # Compare patient (B) vs best-active (A or C)
+        if phase_b_daily > 0 and active_daily > 0:
+            if phase_b_daily >= active_daily * 1.30:
+                suggested_phase = "B"
+                gain_pct = round((phase_b_daily / active_daily - 1) * 100)
                 suggested_phase_reason = (
-                    "Both phases work; insta-buy preferred during active session"
+                    f"Patient offer captures +{gain_pct}% more daily profit vs active cycling"
                 )
-        elif a_profitable:
-            suggested_phase = "A"
-            suggested_phase_reason = "Only profitable when bought at insta-buy price"
-        elif b_profitable:
+            elif spread_pct is not None and spread_pct < 3:
+                suggested_phase = active_phase
+                suggested_phase_reason = (
+                    f"Spread is tight ({spread_pct}%) — no patience premium worth waiting for. "
+                    + (active_reason or "")
+                )
+            else:
+                suggested_phase = active_phase
+                suggested_phase_reason = active_reason
+        elif active_daily > 0:
+            suggested_phase = active_phase
+            suggested_phase_reason = active_reason
+        elif phase_b_daily > 0:
             suggested_phase = "B"
             suggested_phase_reason = "Only profitable via patient GE offer at typical low"
 
@@ -821,6 +892,11 @@ def high_alch():
                 "suggestedPhase": suggested_phase,
                 "suggestedPhaseReason": suggested_phase_reason,
                 "buyLimitSessions": buy_limit_sessions,
+                # Phase C — limit-cadence cycling (4× per day at GE buy-limit cap)
+                "phaseCBuyPrice": phase_c_buy_price,
+                "phaseCItemsPerCycle": phase_c_items_per_cycle,
+                "phaseCProfitPerCycle": phase_c_profit_per_cycle,
+                "phaseCDailyProfit": phase_c_daily_profit,
             }
         )
     results.sort(key=lambda r: r["profitPerAlch"], reverse=True)

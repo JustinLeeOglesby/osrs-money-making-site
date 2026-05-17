@@ -16,9 +16,23 @@ export const ROGUES_LAB_TAB = '🧪 Rogues’ lab';
 export const ROGUES_LIST_MAX = 27;
 export const ROGUES_LIST_STORAGE_KEY = 'osrs-margin-rogues-list';
 export const ROGUES_LAB_STORAGE_KEY = 'osrs-margin-rogues-lab-picks';
+export const ROGUES_LAB_SETTINGS_KEY = 'osrs-margin-rogues-lab-settings';
 // Items with hourly volume below this are flagged as "thin liquidity" so the
 // user can spot rec'd picks that look juicy on paper but won't fill.
+// (This is the default — the lab UI lets the user override it.)
 export const ROGUES_VOLUME_FLOOR = 100;
+
+// Default values for the lab's tunable thresholds. The lab UI lets the user
+// override these so they can experiment with the recommender's behavior
+// without round-tripping through code changes.
+export const ROGUES_LAB_DEFAULTS = {
+  hoursActive: 1.0,           // active cycling time per day
+  volumeFloor: 100,            // min hourly volume to call a pick "strong"
+  strongGpHrMin: 100000,       // realistic gp/hr threshold for 👍 verdict
+  anomalyPct: 15,              // |price - 24h-avg| % above this → ⚠ verdict
+  phaseBPremiumPct: 30,        // Phase B daily must beat active by ≥ this % to override
+  autoRefreshSec: 0,           // 0 = off, otherwise interval in seconds
+};
 
 // GE buy-limit reset window in milliseconds.
 export const GE_LIMIT_WINDOW_MS = 4 * 60 * 60 * 1000;
