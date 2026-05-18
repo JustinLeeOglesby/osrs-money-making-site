@@ -75,6 +75,14 @@ _hourly_cache: dict = {"data": None, "ts": 0.0}
 DAILY_TTL = 30 * 60
 _daily_cache: dict = {"data": None, "ts": 0.0}
 
+# /5m aggregates — short-window "currently active" signal. The wiki refreshes
+# this every 5 minutes; we cache for 60 seconds so several frontend calls in
+# quick succession don't hammer the upstream. Used to distinguish items that
+# are actively trading right now from items whose 1h/24h numbers reflect a
+# stale spike.
+FIVE_MIN_TTL = 60
+_5min_cache: dict = {"data": None, "ts": 0.0}
+
 NATURE_RUNE_ID = 561  # for high alch profit calc
 
 
@@ -102,6 +110,23 @@ def _get_hourly():
         _hourly_cache["data"] = resp.json().get("data", {})
         _hourly_cache["ts"] = now
     return _hourly_cache["data"]
+
+
+def _get_5min():
+    """/5m aggregates — the "currently active" signal.
+
+    Returns {item_id_str: {avgHighPrice, highPriceVolume, avgLowPrice,
+    lowPriceVolume}} reflecting the most recent 5-minute window. Used to flag
+    items that have actually traded in the last few minutes vs items whose
+    longer-window numbers come from a stale spike.
+    """
+    now = time.time()
+    if _5min_cache["data"] is None or (now - _5min_cache["ts"]) > FIVE_MIN_TTL:
+        resp = requests.get(f"{BASE_URL}/5m", headers=HEADERS, timeout=15)
+        resp.raise_for_status()
+        _5min_cache["data"] = resp.json().get("data", {})
+        _5min_cache["ts"] = now
+    return _5min_cache["data"]
 
 
 def _get_daily():
@@ -489,6 +514,7 @@ def flipping():
     mapping = _get_mapping()
     latest = _get_latest()
     hourly = _get_hourly()
+    fivemin = _get_5min()
 
     results = []
     for item_id_str, price_data in latest.items():
@@ -540,6 +566,8 @@ def flipping():
         recent_move_pct = None
         if hourly_avg_high and hourly_avg_high > 0:
             recent_move_pct = round((high - hourly_avg_high) / hourly_avg_high * 100, 2)
+        fm = fivemin.get(item_id_str, {}) or {}
+        recent_5m_volume = (fm.get("highPriceVolume") or 0) + (fm.get("lowPriceVolume") or 0)
         results.append(
             {
                 "id": item_id,
@@ -556,6 +584,9 @@ def flipping():
                 "profitAtLimit": profit_at_limit,
                 "recentMovePct": recent_move_pct,
                 "sanityCapped": sanity_capped,
+                "highTime": price_data.get("highTime"),
+                "lowTime": price_data.get("lowTime"),
+                "recent5mVolume": recent_5m_volume,
             }
         )
     results.sort(key=lambda r: r.get("profitAtLimit") or 0, reverse=True)
@@ -575,6 +606,7 @@ def high_alch():
     latest = _get_latest()
     hourly = _get_hourly()
     daily = _get_daily()
+    fivemin = _get_5min()
 
     nature_entry = latest.get(str(NATURE_RUNE_ID), {})
     nature_price = nature_entry.get("high") or nature_entry.get("low") or 0
@@ -897,6 +929,18 @@ def high_alch():
                 "phaseCItemsPerCycle": phase_c_items_per_cycle,
                 "phaseCProfitPerCycle": phase_c_profit_per_cycle,
                 "phaseCDailyProfit": phase_c_daily_profit,
+                # /latest freshness — when the most recent insta-buy / insta-sell
+                # actually happened. The frontend computes "Last traded ago"
+                # relative to the item's typical trade cadence.
+                "highTime": price_data.get("highTime"),
+                "lowTime": price_data.get("lowTime"),
+                # /5m currently-active signal. recent5mVolume is total trades
+                # in the past 5-min window; is5mActive is the convenience bool.
+                "recent5mVolume": (
+                    (fivemin.get(item_id_str, {}) or {}).get("highPriceVolume") or 0
+                ) + (
+                    (fivemin.get(item_id_str, {}) or {}).get("lowPriceVolume") or 0
+                ),
             }
         )
     results.sort(key=lambda r: r["profitPerAlch"], reverse=True)

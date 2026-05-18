@@ -61,6 +61,10 @@ export default function HighAlchTab() {
   // the 4hr window. Items below this can be theoretically profitable but
   // you'd never actually be able to fill an order for your daily ceiling.
   const [stockableOnly, setStockableOnly] = useState(false);
+  // "Currently active" filter — hide items with zero trades in the latest
+  // 5-min window. Catches items whose 1h/24h numbers look fine but where
+  // the market has actually gone quiet right now.
+  const [active5mOnly, setActive5mOnly] = useState(false);
   // Default sort: "Profit × Volume" — surfaces items that are good on
   // both axes simultaneously, no thresholds needed.
   const [sortKey, setSortKey] = useState('alchScore');
@@ -164,6 +168,9 @@ export default function HighAlchTab() {
         (r) => r.limit && (r.dailyVolumePerHr || 0) >= r.limit / 4
       );
     }
+    if (active5mOnly) {
+      rows = rows.filter((r) => (r.recent5mVolume || 0) > 0);
+    }
     if (query.trim()) {
       const q = query.toLowerCase();
       rows = rows.filter((r) => r.name.toLowerCase().includes(q));
@@ -193,7 +200,7 @@ export default function HighAlchTab() {
       });
     }
     return rows;
-  }, [data, cappedItems, query, sortKey, sortDir, members, tableMode, columns, minProfit, minVolume, maxBuyPrice, favoritesOnly, stockableOnly, favIdSet]);
+  }, [data, cappedItems, query, sortKey, sortDir, members, tableMode, columns, minProfit, minVolume, maxBuyPrice, favoritesOnly, stockableOnly, active5mOnly, favIdSet]);
 
   const toggleSort = (key) => {
     if (sortKey === key) {
@@ -279,6 +286,13 @@ export default function HighAlchTab() {
               📦 Stockable only
             </button>
           )}
+          <button
+            className={`range-btn ${active5mOnly ? 'active' : ''}`}
+            onClick={() => setActive5mOnly((v) => !v)}
+            title="Hide items with zero trades in the latest 5-minute window. Surfaces items that are currently liquid, not items whose 1h/24h numbers reflect a stale earlier spike."
+          >
+            ⚡ Active only (5m)
+          </button>
           <label className="min-filter">
             Min profit:
             <input

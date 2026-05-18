@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, Fragment } from 'react';
-import { fmtGp, profitColor } from '../../utils/format';
+import { fmtGp, profitColor, fmtAgo, stalenessRatio, stalenessColor } from '../../utils/format';
 import { fetchFlipping } from '../../api/client';
 import { useItemModal } from '../../context/ItemModalContext';
 import { useWatchlist } from '../../context/WatchlistContext';
@@ -64,6 +64,53 @@ const COLUMNS = [
         : `${r.recentMovePct > 0 ? '+' : ''}${r.recentMovePct.toFixed(1)}%`,
   },
   { key: 'profitAtLimit', label: 'Profit @ limit', sortBy: (r) => r.profitAtLimit ?? -1, format: (r) => (r.profitAtLimit != null ? fmtGp(r.profitAtLimit) : '—'), profit: true, default: true },
+  {
+    key: 'recent5mVolume',
+    label: '5m',
+    sortBy: (r) => r.recent5mVolume ?? 0,
+    render: (r) => {
+      const v = r.recent5mVolume ?? 0;
+      if (v > 0) {
+        return (
+          <span style={{ color: 'var(--green)' }} title={`${v} trades in the last 5 min`}>
+            ⚡ {v}
+          </span>
+        );
+      }
+      return (
+        <span style={{ color: 'var(--muted)' }} title="No trades in the last 5 min">
+          ◌
+        </span>
+      );
+    },
+    default: true,
+  },
+  {
+    key: 'lastTraded',
+    label: 'Last traded',
+    sortBy: (r) => {
+      const t = Math.max(r.highTime || 0, r.lowTime || 0);
+      return t > 0 ? -t : -Infinity;
+    },
+    render: (r) => {
+      const t = Math.max(r.highTime || 0, r.lowTime || 0);
+      if (!t) return <span style={{ color: 'var(--muted)' }}>—</span>;
+      const ratio = stalenessRatio(t, r.hourlyVolume);
+      const color = stalenessColor(ratio);
+      return (
+        <span
+          style={{ color }}
+          title={
+            ratio != null
+              ? `Staleness ratio: ${ratio.toFixed(1)}× (typical gap ${(3600 / (r.hourlyVolume || 1)).toFixed(0)}s)`
+              : 'No volume data to compute staleness'
+          }
+        >
+          {fmtAgo(t)}
+        </span>
+      );
+    },
+  },
 ];
 
 const MEMBER_FILTERS = [
@@ -221,6 +268,7 @@ export default function FlippingTab() {
   const [bestFlipsOpen, setBestFlipsOpen] = useState(false);
   const [bestFlipsInput, setBestFlipsInput] = useState('');
   const [showDetails, setShowDetails] = useState(false);
+  const [active5mOnly, setActive5mOnly] = useState(false);
   const [activePreset, setActivePreset] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   // Default sort: combined Margin × Volume score.
@@ -302,6 +350,7 @@ export default function FlippingTab() {
     if (minV != null) rows = rows.filter((r) => r.hourlyVolume >= minV);
     const maxBP = parseMin(maxBuyPrice);
     if (maxBP != null) rows = rows.filter((r) => r.low <= maxBP);
+    if (active5mOnly) rows = rows.filter((r) => (r.recent5mVolume || 0) > 0);
     const col = COLUMNS.find((c) => c.key === sortKey);
     if (col) {
       rows = [...rows].sort((a, b) => {
@@ -313,7 +362,7 @@ export default function FlippingTab() {
       });
     }
     return rows;
-  }, [data, query, sortKey, sortDir, members, minProfit, minVolume, maxBuyPrice]);
+  }, [data, query, sortKey, sortDir, members, minProfit, minVolume, maxBuyPrice, active5mOnly]);
 
   const toggleSort = (key) => {
     if (sortKey === key) {
@@ -459,6 +508,13 @@ export default function FlippingTab() {
             title="Toggle extra columns (ROI, GE limit, Move, Margin × Vol)"
           >
             {showDetails ? 'Less detail' : 'Show details'}
+          </button>
+          <button
+            className={`range-btn ${active5mOnly ? 'active' : ''}`}
+            onClick={() => setActive5mOnly((v) => !v)}
+            title="Hide items with zero trades in the latest 5-minute window. Surfaces items currently moving, not paper margins from a stale hour-old spike."
+          >
+            ⚡ Active only (5m)
           </button>
           <button className="range-btn" onClick={load} disabled={refreshing}>
             {refreshing ? 'Refreshing…' : 'Refresh'}

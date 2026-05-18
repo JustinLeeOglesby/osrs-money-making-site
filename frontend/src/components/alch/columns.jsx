@@ -1,4 +1,4 @@
-import { fmtGp } from '../../utils/format';
+import { fmtGp, fmtAgo, stalenessRatio, stalenessColor } from '../../utils/format';
 import ItemNameCell from '../ItemNameCell';
 
 // Compact gp formatter for very large numbers (millions/billions) — used by
@@ -47,6 +47,60 @@ const dailyVolCol = {
     r.dailyVolumePerHr != null ? r.dailyVolumePerHr.toLocaleString() : '—',
 };
 
+// "Last traded" relative time, color-coded by staleness ratio (age vs typical
+// inter-trade gap given the item's hourly volume). Green = on schedule,
+// yellow = several gaps overdue, red = effectively gone dark.
+const lastTradedCol = {
+  key: 'lastTraded',
+  label: 'Last traded',
+  sortBy: (r) => {
+    const t = Math.max(r.highTime || 0, r.lowTime || 0);
+    return t > 0 ? -t : -Infinity; // reverse: most recent first when sorted desc
+  },
+  render: (r) => {
+    const t = Math.max(r.highTime || 0, r.lowTime || 0);
+    if (!t) return <span style={{ color: 'var(--muted)' }}>—</span>;
+    const ratio = stalenessRatio(t, r.hourlyVolume);
+    const color = stalenessColor(ratio);
+    return (
+      <span
+        style={{ color }}
+        title={
+          ratio != null
+            ? `Staleness ratio: ${ratio.toFixed(1)}× (expected gap is ~${(3600 / (r.hourlyVolume || 1)).toFixed(0)}s)`
+            : 'No hourly volume data to compute staleness'
+        }
+      >
+        {fmtAgo(t)}
+      </span>
+    );
+  },
+};
+
+// "5m active" — small indicator showing whether the item traded in the
+// latest 5-minute window. Useful for distinguishing items that are *currently*
+// liquid from items whose 1h/24h numbers reflect a stale earlier spike.
+const active5mCol = {
+  key: 'recent5mVolume',
+  label: '5m',
+  sortBy: (r) => r.recent5mVolume ?? 0,
+  render: (r) => {
+    const v = r.recent5mVolume ?? 0;
+    if (v > 0) {
+      return (
+        <span style={{ color: 'var(--green)' }} title={`${v} trades in the last 5 min`}>
+          ⚡ {v}
+        </span>
+      );
+    }
+    return (
+      <span style={{ color: 'var(--muted)' }} title="No trades in the last 5 min">
+        ◌
+      </span>
+    );
+  },
+};
+
 // "Profit × Volume" is the cheap-but-effective way to rank items high on
 // both axes at once: an item with 100gp profit × 10,000 hourly volume scores
 // the same as 10,000gp × 100, but neither stale-but-juicy nor cheap-but-
@@ -75,6 +129,8 @@ export const ALCH_COLUMNS = [
   { key: 'limit', label: 'GE limit', sortBy: (r) => r.limit ?? -1, format: (r) => (r.limit != null ? r.limit.toLocaleString() : '—') },
   { key: 'hourlyVolume', label: 'Hourly vol', sortBy: (r) => r.hourlyVolume, format: (r) => r.hourlyVolume.toLocaleString() },
   dailyVolCol,
+  active5mCol,
+  lastTradedCol,
   alchScoreCol,
   moveCol,
   { key: 'totalProfitAtLimit', label: 'Profit @ limit', sortBy: (r) => r.totalProfitAtLimit ?? -1, format: (r) => (r.totalProfitAtLimit != null ? fmtGp(r.totalProfitAtLimit) : '—'), profit: true },
@@ -136,6 +192,8 @@ export const ROGUES_COLUMNS = [
   { key: 'limit', label: 'GE limit', sortBy: (r) => r.limit ?? -1, format: (r) => (r.limit != null ? r.limit.toLocaleString() : '—') },
   { key: 'hourlyVolume', label: 'Hourly vol', sortBy: (r) => r.hourlyVolume, format: (r) => r.hourlyVolume.toLocaleString() },
   dailyVolCol,
+  active5mCol,
+  lastTradedCol,
   roguesScoreCol,
   moveCol,
   {
