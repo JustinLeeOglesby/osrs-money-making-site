@@ -370,7 +370,7 @@ export default function RoguesListTab() {
 function PoolTable({ title, rows, emptyMessage, renderActions, onRowClick, maxSells }) {
   return (
     <div className="table-scroll">
-      <table className="alch-table">
+      <table className="alch-table bounded-table">
         <thead>
           <tr>
             <th style={{ width: '2.5em' }} />
@@ -431,7 +431,7 @@ function PoolTable({ title, rows, emptyMessage, renderActions, onRowClick, maxSe
 function RecsTable({ rows, maxSells, anomalyPct, onAdd, onRowClick, emptyMessage, isFallback }) {
   return (
     <div className="table-scroll">
-      <table className="alch-table">
+      <table className="alch-table bounded-table">
         <thead>
           <tr>
             <th style={{ width: '2.5em' }} />

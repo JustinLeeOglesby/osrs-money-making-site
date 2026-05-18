@@ -475,12 +475,14 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
   font-size: 0.9em;
 }
 .lab-table { font-size: 0.85em; }
-/* The global .alch-table th rule sticks headers to the viewport top, which is
-   right for the long high-alch table but wrong for the bounded lab panels —
-   it leaves the headers floating mid-scroll over the rows. The compound
-   selector here outranks the bare `.alch-table th` rule defined later in this
-   file, so headers in lab tables stay in their natural position. */
-.alch-table.lab-table th {
+/* The global .alch-table th rule sticks headers to the viewport top, which
+   is right for the long high-alch table but wrong for shorter bounded tables
+   (lab panels, running list, etc.) where it leaves headers floating
+   mid-scroll over rows. Apply the `.bounded-table` modifier to opt out.
+   The compound selector outranks the bare `.alch-table th` rule defined
+   later in this file. */
+.alch-table.lab-table th,
+.alch-table.bounded-table th {
   position: static;
   top: auto;
   background: var(--bg-3);
