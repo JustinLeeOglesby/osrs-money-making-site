@@ -36,6 +36,17 @@ const moveCol = {
       : `${r.recentMovePct > 0 ? '+' : ''}${r.recentMovePct.toFixed(1)}%`,
 };
 
+// 24h-averaged hourly volume — the smoothed baseline that drives the
+// realistic gp/hr calculation. Useful alongside the spikier 1h volume so the
+// user can spot items where the 1h count is an outlier vs typical throughput.
+const dailyVolCol = {
+  key: 'dailyVolumePerHr',
+  label: '24h vol/hr',
+  sortBy: (r) => r.dailyVolumePerHr ?? 0,
+  format: (r) =>
+    r.dailyVolumePerHr != null ? r.dailyVolumePerHr.toLocaleString() : '—',
+};
+
 // "Profit × Volume" is the cheap-but-effective way to rank items high on
 // both axes at once: an item with 100gp profit × 10,000 hourly volume scores
 // the same as 10,000gp × 100, but neither stale-but-juicy nor cheap-but-
@@ -63,6 +74,7 @@ export const ALCH_COLUMNS = [
   { key: 'profitPerAlch', label: 'Profit / alch', sortBy: (r) => r.profitPerAlch, format: (r) => fmtGp(r.profitPerAlch), profit: true },
   { key: 'limit', label: 'GE limit', sortBy: (r) => r.limit ?? -1, format: (r) => (r.limit != null ? r.limit.toLocaleString() : '—') },
   { key: 'hourlyVolume', label: 'Hourly vol', sortBy: (r) => r.hourlyVolume, format: (r) => r.hourlyVolume.toLocaleString() },
+  dailyVolCol,
   alchScoreCol,
   moveCol,
   { key: 'totalProfitAtLimit', label: 'Profit @ limit', sortBy: (r) => r.totalProfitAtLimit ?? -1, format: (r) => (r.totalProfitAtLimit != null ? fmtGp(r.totalProfitAtLimit) : '—'), profit: true },
@@ -123,6 +135,7 @@ export const ROGUES_COLUMNS = [
   },
   { key: 'limit', label: 'GE limit', sortBy: (r) => r.limit ?? -1, format: (r) => (r.limit != null ? r.limit.toLocaleString() : '—') },
   { key: 'hourlyVolume', label: 'Hourly vol', sortBy: (r) => r.hourlyVolume, format: (r) => r.hourlyVolume.toLocaleString() },
+  dailyVolCol,
   roguesScoreCol,
   moveCol,
   {

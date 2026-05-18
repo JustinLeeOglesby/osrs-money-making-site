@@ -152,11 +152,17 @@ export default function HighAlchTab() {
     if (tableMode === 'rogues') rows = rows.filter((r) => r.roguesProfitPerSession > 0);
     else rows = rows.filter((r) => r.profitPerAlch > 0);
     if (favoritesOnly) rows = rows.filter((r) => favIdSet.has(r.id));
-    // Rogues' Den: drop items whose hourly trade volume can't realistically
-    // sustain buying out the GE 4hr limit. `hourlyVolume >= limit / 4` is
-    // the break-even: 4 hours × hourly_volume covers one buy-limit period.
+    // Rogues' Den: drop items whose typical hourly trade volume can't
+    // realistically sustain buying out the GE 4hr limit. We check the
+    // 24h-averaged volume (smoothed, honest baseline) rather than the
+    // spiky 1h count — a single recent trade can inflate the 1h figure
+    // and make a thin market look stockable when it isn't.
+    // Break-even: 24h_avg_per_hr >= limit / 4  (i.e. 4 hours of typical
+    // throughput covers one buy-limit period).
     if (tableMode === 'rogues' && stockableOnly) {
-      rows = rows.filter((r) => r.limit && r.hourlyVolume >= r.limit / 4);
+      rows = rows.filter(
+        (r) => r.limit && (r.dailyVolumePerHr || 0) >= r.limit / 4
+      );
     }
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -268,7 +274,7 @@ export default function HighAlchTab() {
             <button
               className={`range-btn ${stockableOnly ? 'active' : ''}`}
               onClick={() => setStockableOnly((v) => !v)}
-              title="Hide items whose hourly volume can't sustain the GE 4hr buy limit (i.e., requires hourly volume ≥ buy_limit / 4)"
+              title="Hide items whose 24h-averaged hourly volume can't sustain the GE 4hr buy limit (requires 24h vol/hr ≥ buy_limit / 4). Uses the smoothed 24h baseline, not the spikier 1h count."
             >
               📦 Stockable only
             </button>
@@ -324,6 +330,12 @@ export default function HighAlchTab() {
             this is positive, you aren't selling at a loss. <strong>"Floor (info)"</strong>{' '}
             = margin if you kept selling past sale 20 to the price floor (informational only;
             we never recommend reaching floor unless the floor itself is still profitable).
+            <br />
+            <strong>"Hourly vol"</strong> is the spiky past-1h count;{' '}
+            <strong>"24h vol/hr"</strong> is the smoothed average that actually drives the
+            realistic gp/hr math. When they diverge widely, the 1h count is probably an
+            outlier — use the <strong>📦 Stockable only</strong> toggle to filter out items
+            where 24h vol/hr can't sustain the GE buy limit.
           </div>
         ) : (
           <div className="alch-note">
