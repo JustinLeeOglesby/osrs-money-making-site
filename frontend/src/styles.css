@@ -342,20 +342,20 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
   .alch-controls { gap: 0.4em; }
   .alch-note { font-size: 0.78em; padding: 0.5em 0.65em; }
 
-  /* Mobile sticky header fix.
-     Desktop uses --header-offset: 110px (the height of the desktop page
-     header) so column headers sit just below it. On mobile the page header
-     is also sticky at top:0 with z-index 10, but it's much taller than
-     110px once h1/meta/search/pace wrap. The previous setup anchored
-     column headers at 110px from viewport top — well *inside* the visible
-     page header area — so rows 2-3 of the table appeared to "slide under"
-     a phantom band. Simpler solution: drop the offset on mobile, let the
-     page header scroll away naturally, and pin column headers to top:0
-     once the table reaches the viewport edge. */
+  /* Mobile sticky header — disable entirely.
+     Sticky positioning + the `.table-scroll` wrapper's overflow-x:auto don't
+     compose cleanly on mobile: the th's scroll-containing-block becomes the
+     overflow container (not the viewport), so headers "stick" at the top of
+     the table wrapper — which is moving with the page scroll — and end up
+     floating over rows in the middle of the screen. Static positioning
+     keeps them at the natural top of the table where they belong. Trade-off:
+     when you scroll past the headers they scroll out of view; pull up to
+     remind yourself what columns are which. */
   .alch-table th {
-    top: 0;
-    z-index: 8;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    position: static;
+    top: auto;
+    z-index: auto;
+    box-shadow: none;
   }
 
   /* === Modal: full-screen on phones === */
