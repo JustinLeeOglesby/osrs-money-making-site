@@ -55,6 +55,12 @@ export default function HighAlchTab() {
   const [minVolume, setMinVolume] = useState('');
   const [maxBuyPrice, setMaxBuyPrice] = useState('');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  // Rogues' Den only: when on, hides items whose hourly volume can't supply
+  // the GE 4hr buy limit. Threshold: hourlyVolume >= limit / 4 means at the
+  // market's current trade rate, you can actually buy out your full limit in
+  // the 4hr window. Items below this can be theoretically profitable but
+  // you'd never actually be able to fill an order for your daily ceiling.
+  const [stockableOnly, setStockableOnly] = useState(false);
   // Default sort: "Profit × Volume" — surfaces items that are good on
   // both axes simultaneously, no thresholds needed.
   const [sortKey, setSortKey] = useState('alchScore');
@@ -146,6 +152,12 @@ export default function HighAlchTab() {
     if (tableMode === 'rogues') rows = rows.filter((r) => r.roguesProfitPerSession > 0);
     else rows = rows.filter((r) => r.profitPerAlch > 0);
     if (favoritesOnly) rows = rows.filter((r) => favIdSet.has(r.id));
+    // Rogues' Den: drop items whose hourly trade volume can't realistically
+    // sustain buying out the GE 4hr limit. `hourlyVolume >= limit / 4` is
+    // the break-even: 4 hours × hourly_volume covers one buy-limit period.
+    if (tableMode === 'rogues' && stockableOnly) {
+      rows = rows.filter((r) => r.limit && r.hourlyVolume >= r.limit / 4);
+    }
     if (query.trim()) {
       const q = query.toLowerCase();
       rows = rows.filter((r) => r.name.toLowerCase().includes(q));
@@ -175,7 +187,7 @@ export default function HighAlchTab() {
       });
     }
     return rows;
-  }, [data, cappedItems, query, sortKey, sortDir, members, tableMode, columns, minProfit, minVolume, maxBuyPrice, favoritesOnly, favIdSet]);
+  }, [data, cappedItems, query, sortKey, sortDir, members, tableMode, columns, minProfit, minVolume, maxBuyPrice, favoritesOnly, stockableOnly, favIdSet]);
 
   const toggleSort = (key) => {
     if (sortKey === key) {
@@ -252,6 +264,15 @@ export default function HighAlchTab() {
           >
             ★ Favorites only{favItems.length ? ` (${favItems.length})` : ''}
           </button>
+          {tableMode === 'rogues' && (
+            <button
+              className={`range-btn ${stockableOnly ? 'active' : ''}`}
+              onClick={() => setStockableOnly((v) => !v)}
+              title="Hide items whose hourly volume can't sustain the GE 4hr buy limit (i.e., requires hourly volume ≥ buy_limit / 4)"
+            >
+              📦 Stockable only
+            </button>
+          )}
           <label className="min-filter">
             Min profit:
             <input
