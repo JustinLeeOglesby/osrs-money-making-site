@@ -426,6 +426,24 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
 }
 .fav-btn:hover { color: var(--text); }
 .fav-btn.on { color: #f3c54a; }
+/* 🔔 alert toggle: dim by default (just a 🔕 affordance), accent-blue when
+   watching, and pulses gold when currently triggered (profit ≥ threshold). */
+.alert-btn {
+  background: none; border: none; padding: 0 0.5em 0 0; margin: 0;
+  cursor: pointer; font-size: 0.95em; line-height: 1;
+  vertical-align: middle; opacity: 0.35; filter: grayscale(0.6);
+}
+.alert-btn:hover { opacity: 1; filter: none; }
+.alert-btn.on { opacity: 1; filter: none; }
+.alert-btn.triggered { animation: alert-pulse 1.4s infinite; }
+@keyframes alert-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.alert-pip { font-size: 0.95em; line-height: 1; }
+.alert-pip.idle      { color: var(--muted); }
+.alert-pip.neg       { /* emoji color */ }
+.alert-pip.triggered { animation: alert-pulse 1.4s infinite; }
 .rogues-toggle {
   background: none; border: none; padding: 0 0.5em 0 0; margin: 0;
   cursor: pointer; font-size: 0.95em; line-height: 1;

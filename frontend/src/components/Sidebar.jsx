@@ -8,12 +8,14 @@ import {
   SHOPS_TAB,
   ROGUES_LIST_TAB,
   ROGUES_LAB_TAB,
+  ALERTS_TAB,
 } from '../utils/constants';
 import { useWatchlist } from '../context/WatchlistContext';
 import { useItemFavorites } from '../context/ItemFavoritesContext';
 import { useGELimits, isReady } from '../context/GELimitsContext';
 import { useRoguesList } from '../context/RoguesListContext';
 import { useRoguesLab } from '../context/RoguesLabContext';
+import { useRecipeAlerts } from '../context/RecipeAlertsContext';
 
 // Left-nav sidebar. "Pinned" section holds the always-available special
 // tabs (favorites / item search / high alch); "Categories" holds the
@@ -31,6 +33,7 @@ export default function Sidebar({
   const { entries: geLimitEntries, now: geLimitsNow } = useGELimits();
   const { count: roguesCount } = useRoguesList();
   const { count: labCount } = useRoguesLab();
+  const { items: alertItems, triggered: alertTriggered } = useRecipeAlerts();
   // Combined favorites count (recipes + items) for the nav badge.
   const totalFavorites = favoritesCount + favItems.length;
   // Count entries that have at least one fired alert key.
@@ -96,6 +99,13 @@ export default function Sidebar({
           count={labCount > 0 ? labCount : null}
           active={ROGUES_LAB_TAB === activeTab}
           onClick={() => onSelectTab(ROGUES_LAB_TAB)}
+        />
+        <NavItem
+          label={ALERTS_TAB}
+          count={alertItems.length > 0 ? alertItems.length : null}
+          badge={alertTriggered.size > 0 ? alertTriggered.size : null}
+          active={ALERTS_TAB === activeTab}
+          onClick={() => onSelectTab(ALERTS_TAB)}
         />
       </div>
       <div className="sidebar-section">

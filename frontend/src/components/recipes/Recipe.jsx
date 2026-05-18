@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { fmtGp } from '../../utils/format';
 import { usePace } from '../../context/PaceContext';
+import { useRecipeAlerts } from '../../context/RecipeAlertsContext';
 import RecipeDetail from './RecipeDetail';
 
 // Single recipe row. Collapsed shows: name + level chip, profit, XP,
@@ -10,6 +11,9 @@ import RecipeDetail from './RecipeDetail';
 export default function Recipe({ r, isFavorite, onToggleFavorite }) {
   const [open, setOpen] = useState(false);
   const { actionsPerHour } = usePace();
+  const { isAlerted, isTriggered, toggle: toggleAlert } = useRecipeAlerts();
+  const alerted = isAlerted(r.name);
+  const triggered = isTriggered(r.name);
   const klass = r.profit > 0 ? 'pos' : r.profit < 0 ? 'neg' : '';
 
   const lineStr = (l) =>
@@ -50,6 +54,23 @@ export default function Recipe({ r, isFavorite, onToggleFavorite }) {
               aria-label={isFavorite ? 'Unfavorite' : 'Favorite'}
             >
               {isFavorite ? '★' : '☆'}
+            </button>
+            <button
+              className={`alert-btn ${alerted ? 'on' : ''} ${triggered ? 'triggered' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleAlert(r.name);
+              }}
+              title={
+                alerted
+                  ? triggered
+                    ? `🔔 Triggered! ${r.name} is currently profitable. Click to stop watching.`
+                    : `Watching for profit flip. Click to stop watching.`
+                  : 'Notify me when this becomes profitable'
+              }
+              aria-label={alerted ? 'Stop watching for profit flip' : 'Watch for profit flip'}
+            >
+              {alerted ? '🔔' : '🔕'}
             </button>
             {r.name}
             {r.levelReq && <span className="level-chip">{r.levelReq}</span>}

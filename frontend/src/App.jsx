@@ -9,6 +9,7 @@ import { PaceProvider } from './context/PaceContext';
 import { RoguesListProvider } from './context/RoguesListContext';
 import { RoguesLabProvider } from './context/RoguesLabContext';
 import { SyncProvider } from './context/SyncContext';
+import { RecipeAlertsProvider, useRecipeAlerts } from './context/RecipeAlertsContext';
 import {
   FAVORITES_TAB,
   ALCH_TAB,
@@ -19,7 +20,9 @@ import {
   SHOPS_TAB,
   ROGUES_LIST_TAB,
   ROGUES_LAB_TAB,
+  ALERTS_TAB,
   FAVORITES_STORAGE_KEY,
+  RECIPE_ALERT_POLL_MS,
   tabToSlug,
 } from './utils/constants';
 
@@ -36,6 +39,7 @@ import ChainExplorer from './components/chain/ChainExplorer';
 import ShopsTab from './components/shops/ShopsTab';
 import RoguesListTab from './components/rogueslist/RoguesListTab';
 import RoguesLabTab from './components/rogueslab/RoguesLabTab';
+import AlertsTab from './components/alerts/AlertsTab';
 
 // Composition root. Owns:
 //   - the recipe payload (fetched from /api/recipes)
@@ -111,7 +115,7 @@ export default function App() {
   // The maps are used to read the active tab from the URL on load and to
   // push a new URL whenever the user picks a different tab.
   const allTabs = useMemo(
-    () => [FAVORITES_TAB, WATCHLIST_TAB, ALCH_TAB, FLIPPING_TAB, GE_LIMITS_TAB, CHAIN_TAB, SHOPS_TAB, ROGUES_LIST_TAB, ROGUES_LAB_TAB, ...categories],
+    () => [FAVORITES_TAB, WATCHLIST_TAB, ALCH_TAB, FLIPPING_TAB, GE_LIMITS_TAB, CHAIN_TAB, SHOPS_TAB, ROGUES_LIST_TAB, ROGUES_LAB_TAB, ALERTS_TAB, ...categories],
     [categories]
   );
   const slugToTab = useMemo(() => {
@@ -192,6 +196,7 @@ export default function App() {
 
   return (
     <SyncProvider>
+    <RecipeAlertsProvider>
     <ItemFavoritesProvider>
     <RoguesListProvider>
     <RoguesLabProvider>
@@ -199,6 +204,10 @@ export default function App() {
     <PaceProvider>
     <WatchlistProvider>
     <ItemModalContext.Provider value={modalCtx}>
+      <AlertChecker
+        recipes={payload.recipes}
+        onAutoRefresh={() => fetchRecipes().then(setPayload).catch(() => {})}
+      />
       <Header
         recipeCount={payload.recipes.length}
         strategyLabel={strategyLabel}
@@ -230,6 +239,8 @@ export default function App() {
             <RoguesListTab key={ROGUES_LIST_TAB} />
           ) : activeTab === ROGUES_LAB_TAB ? (
             <RoguesLabTab key={ROGUES_LAB_TAB} />
+          ) : activeTab === ALERTS_TAB ? (
+            <AlertsTab key={ALERTS_TAB} payload={payload} />
           ) : activeTab === FAVORITES_TAB ? (
             <FavoritesTab
               key={FAVORITES_TAB}
@@ -264,6 +275,31 @@ export default function App() {
     </RoguesLabProvider>
     </RoguesListProvider>
     </ItemFavoritesProvider>
+    </RecipeAlertsProvider>
     </SyncProvider>
   );
+}
+
+// AlertChecker runs the recipe-alerts transition detector on every payload
+// update and also drives the 10-minute auto-poll while at least one alert is
+// set. It renders nothing — pure side-effects. Lives inside the provider
+// tree so it can read `items` and call `checkAndFireAlerts` from context.
+function AlertChecker({ recipes, onAutoRefresh }) {
+  const { items, checkAndFireAlerts } = useRecipeAlerts();
+
+  // Run transition detection whenever recipes update.
+  useEffect(() => {
+    if (!recipes || items.length === 0) return;
+    checkAndFireAlerts(recipes);
+  }, [recipes, items, checkAndFireAlerts]);
+
+  // Background auto-poll. Only runs when at least one alert is set, so users
+  // who don't use the feature don't pay for unnecessary polling.
+  useEffect(() => {
+    if (items.length === 0) return;
+    const id = setInterval(onAutoRefresh, RECIPE_ALERT_POLL_MS);
+    return () => clearInterval(id);
+  }, [items.length, onAutoRefresh]);
+
+  return null;
 }

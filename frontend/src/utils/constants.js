@@ -10,6 +10,7 @@ export const CHAIN_TAB = '🔗 Chain explorer';
 export const SHOPS_TAB = '🏪 Shop trades';
 export const ROGUES_LIST_TAB = '🎒 Rogues’ list';
 export const ROGUES_LAB_TAB = '🧪 Rogues’ lab';
+export const ALERTS_TAB = '🔔 Profit alerts';
 
 // Rogues' Den "running list" — a curated, stable pool of priority items
 // the user keeps cycling. Sized to their playstyle (hours/day × sells/hour ÷
@@ -31,6 +32,18 @@ export const ROGUES_VOLUME_FLOOR = 100;
 // Default values for the lab's tunable thresholds. The lab UI lets the user
 // override these so they can experiment with the recommender's behavior
 // without round-tripping through code changes.
+// Recipe profit alerts — watch recipes that are usually unprofitable but
+// occasionally cross break-even, and get a browser notification when one
+// flips into the profit zone. Default threshold is +1 gp ("just barely
+// worth doing").
+export const RECIPE_ALERTS_STORAGE_KEY = 'osrs-margin-recipe-alerts';
+export const RECIPE_ALERTS_STATE_KEY = 'osrs-margin-recipe-alerts-state';
+export const RECIPE_ALERT_THRESHOLD = 1;
+// Auto-poll the recipes endpoint every N ms while at least one alert is set.
+// 10 minutes balances "catch random flips" with "don't hammer Render's free
+// tier or the wiki API."
+export const RECIPE_ALERT_POLL_MS = 10 * 60 * 1000;
+
 export const ROGUES_LAB_DEFAULTS = {
   hoursActive: 1.0,           // active cycling time per day
   volumeFloor: 100,            // min hourly volume to call a pick "strong"
