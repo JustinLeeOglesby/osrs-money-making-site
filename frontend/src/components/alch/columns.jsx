@@ -107,9 +107,18 @@ export const ROGUES_COLUMNS = [
   },
   {
     key: 'roguesGpPerHr',
-    label: 'GP / hr (optimal)',
+    label: 'GP / hr (realistic)',
     sortBy: (r) => r.roguesGpPerHr ?? 0,
     format: (r) => (r.roguesGpPerHr ? fmtGp(r.roguesGpPerHr) : '—'),
+    profit: true,
+  },
+  {
+    // Phase C-style daily ceiling: 4 × buy_limit × avg_profit_per_item at
+    // your capped sells/session. The hard ceiling from the GE 4hr buy limit.
+    key: 'roguesDailyCeiling',
+    label: 'Daily ceiling',
+    sortBy: (r) => r.roguesDailyCeiling ?? 0,
+    format: (r) => (r.roguesDailyCeiling ? fmtGp(r.roguesDailyCeiling) : '—'),
     profit: true,
   },
   { key: 'limit', label: 'GE limit', sortBy: (r) => r.limit ?? -1, format: (r) => (r.limit != null ? r.limit.toLocaleString() : '—') },
