@@ -8,7 +8,6 @@ import {
   SHOPS_TAB,
   ROGUES_LIST_TAB,
   ROGUES_LAB_TAB,
-  ROGUES_LIST_MAX,
 } from '../utils/constants';
 import { useWatchlist } from '../context/WatchlistContext';
 import { useItemFavorites } from '../context/ItemFavoritesContext';
@@ -88,7 +87,7 @@ export default function Sidebar({
         />
         <NavItem
           label={ROGUES_LIST_TAB}
-          count={roguesCount > 0 ? `${roguesCount}/${ROGUES_LIST_MAX}` : null}
+          count={roguesCount > 0 ? roguesCount : null}
           active={ROGUES_LIST_TAB === activeTab}
           onClick={() => onSelectTab(ROGUES_LIST_TAB)}
         />

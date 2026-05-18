@@ -11,9 +11,15 @@ export const SHOPS_TAB = '🏪 Shop trades';
 export const ROGUES_LIST_TAB = '🎒 Rogues’ list';
 export const ROGUES_LAB_TAB = '🧪 Rogues’ lab';
 
-// Rogues' Den 27-slot tracker. 28th inventory slot is the coin pile, so the
-// usable shopping list is exactly 27 items.
-export const ROGUES_LIST_MAX = 27;
+// Rogues' Den "running list" — a curated, stable pool of priority items
+// the user keeps cycling. Sized to their playstyle (hours/day × sells/hour ÷
+// 4 × buy_limit), not a fixed cap. We keep this constant as a soft target
+// only (used for legacy compat); the UI no longer caps adds.
+export const ROGUES_LIST_MAX = 100;
+// Buy-limit threshold separating "priority" items (low limit, high margin)
+// from "fallback" items (high volume, always-on, lower margin). Users can
+// override in the lab settings.
+export const ROGUES_PRIORITY_LIMIT_MAX = 125;
 export const ROGUES_LIST_STORAGE_KEY = 'osrs-margin-rogues-list';
 export const ROGUES_LAB_STORAGE_KEY = 'osrs-margin-rogues-lab-picks';
 export const ROGUES_LAB_SETTINGS_KEY = 'osrs-margin-rogues-lab-settings';
@@ -32,6 +38,8 @@ export const ROGUES_LAB_DEFAULTS = {
   anomalyPct: 15,              // |price - 24h-avg| % above this → ⚠ verdict
   phaseBPremiumPct: 30,        // Phase B daily must beat active by ≥ this % to override
   autoRefreshSec: 0,           // 0 = off, otherwise interval in seconds
+  cyclingEfficiency: 0.6,      // % of theoretical max session rate user actually sustains
+  priorityLimitMax: 125,       // buy-limit cap for "priority" tier in the running list
 };
 
 // GE buy-limit reset window in milliseconds.

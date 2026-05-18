@@ -1,13 +1,15 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { ROGUES_LIST_STORAGE_KEY, ROGUES_LIST_MAX } from '../utils/constants';
 
-// The "27-slot list" — items the user is actively cycling at Martin Thwait's
-// Lost and Found (Rogues' Den). Capped at ROGUES_LIST_MAX (27) to match the
-// usable inventory slots (slot 28 holds coins for buying from the GE).
+// The "running list" — a curated, stable pool of items the user is cycling
+// through Martin Thwait's Lost and Found (Rogues' Den). Originally capped at
+// 27 to match an OSRS inventory; that constraint was dropped once we realized
+// the working unit is "items I'm always buying," not "items in my bag right
+// now." Pool size is now driven by playstyle math (target throughput / supply
+// per item × buffer); the UI shows coverage ratio but doesn't hard-cap adds.
 //
 // Distinct from item favorites: favorites are "things I want to remember";
-// the rogues list is "things I'm actively running right now". An item is
-// typically added to favorites first, then promoted to the active list.
+// the running list is "things I'm actively cycling right now."
 
 const RoguesListContext = createContext({
   items: [],
