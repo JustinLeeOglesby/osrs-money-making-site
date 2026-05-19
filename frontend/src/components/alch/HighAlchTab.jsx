@@ -44,31 +44,88 @@ function parseMin(s) {
   return Number.isFinite(n) ? n : null;
 }
 
+// Read the current URL search params once for state initialization. Encoded
+// keys are kept short (?mode=, ?vol=, etc.) so a fully-loaded URL stays
+// readable when shared/bookmarked. State defaults are not serialized — only
+// "non-default" values appear in the URL.
+function readUrlState() {
+  if (typeof window === 'undefined') return {};
+  const p = new URLSearchParams(window.location.search);
+  const get = (k) => p.get(k) || '';
+  const flag = (k) => p.get(k) === '1';
+  const mode = p.get('mode') === 'rogues' ? 'rogues' : 'alch';
+  return {
+    mode,
+    members: ['f2p', 'p2p'].includes(get('members')) ? get('members') : 'all',
+    query: get('q'),
+    minProfit: get('min-profit'),
+    minVolume: get('min-vol'),
+    maxBuyPrice: get('max-buy'),
+    favoritesOnly: flag('favs'),
+    stockableOnly: flag('stockable'),
+    active5mOnly: flag('active'),
+    sortKey: get('sort') || (mode === 'rogues' ? 'roguesScore' : 'alchScore'),
+    sortDir: get('dir') === 'asc' ? 'asc' : 'desc',
+  };
+}
+
 export default function HighAlchTab() {
+  // Hydrate all user-facing filter state from URL on mount, so refresh / back
+  // / bookmarking lands the user in the exact same view.
+  const _initial = readUrlState();
+
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [query, setQuery] = useState('');
-  const [tableMode, setTableMode] = useState('alch');
-  const [members, setMembers] = useState('all');
-  const [minProfit, setMinProfit] = useState('');
-  const [minVolume, setMinVolume] = useState('');
-  const [maxBuyPrice, setMaxBuyPrice] = useState('');
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [query, setQuery] = useState(_initial.query);
+  const [tableMode, setTableMode] = useState(_initial.mode);
+  const [members, setMembers] = useState(_initial.members);
+  const [minProfit, setMinProfit] = useState(_initial.minProfit);
+  const [minVolume, setMinVolume] = useState(_initial.minVolume);
+  const [maxBuyPrice, setMaxBuyPrice] = useState(_initial.maxBuyPrice);
+  const [favoritesOnly, setFavoritesOnly] = useState(_initial.favoritesOnly);
   // Rogues' Den only: when on, hides items whose hourly volume can't supply
   // the GE 4hr buy limit. Threshold: hourlyVolume >= limit / 4 means at the
   // market's current trade rate, you can actually buy out your full limit in
   // the 4hr window. Items below this can be theoretically profitable but
   // you'd never actually be able to fill an order for your daily ceiling.
-  const [stockableOnly, setStockableOnly] = useState(false);
+  const [stockableOnly, setStockableOnly] = useState(_initial.stockableOnly);
   // "Currently active" filter — hide items with zero trades in the latest
   // 5-min window. Catches items whose 1h/24h numbers look fine but where
   // the market has actually gone quiet right now.
-  const [active5mOnly, setActive5mOnly] = useState(false);
+  const [active5mOnly, setActive5mOnly] = useState(_initial.active5mOnly);
   // Default sort: "Profit × Volume" — surfaces items that are good on
   // both axes simultaneously, no thresholds needed.
-  const [sortKey, setSortKey] = useState('alchScore');
-  const [sortDir, setSortDir] = useState('desc');
+  const [sortKey, setSortKey] = useState(_initial.sortKey);
+  const [sortDir, setSortDir] = useState(_initial.sortDir);
+
+  // Persist every filter change back to the URL. Uses replaceState so we
+  // don't pollute the back-button history with every keystroke. Defaults
+  // are omitted to keep the URL short.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (tableMode !== 'alch') p.set('mode', tableMode);
+    if (members !== 'all') p.set('members', members);
+    if (query) p.set('q', query);
+    if (minProfit) p.set('min-profit', minProfit);
+    if (minVolume) p.set('min-vol', minVolume);
+    if (maxBuyPrice) p.set('max-buy', maxBuyPrice);
+    if (favoritesOnly) p.set('favs', '1');
+    if (stockableOnly) p.set('stockable', '1');
+    if (active5mOnly) p.set('active', '1');
+    const defaultSort = tableMode === 'rogues' ? 'roguesScore' : 'alchScore';
+    if (sortKey !== defaultSort) p.set('sort', sortKey);
+    if (sortDir !== 'desc') p.set('dir', sortDir);
+    const search = p.toString();
+    const newUrl = window.location.pathname + (search ? `?${search}` : '');
+    if (window.location.pathname + window.location.search !== newUrl) {
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [
+    tableMode, members, query, minProfit, minVolume, maxBuyPrice,
+    favoritesOnly, stockableOnly, active5mOnly, sortKey, sortDir,
+  ]);
   const { open: openItemModal } = useItemModal();
   const { items: favItems } = useItemFavorites();
   const favIdSet = useMemo(() => new Set(favItems.map((it) => it.id)), [favItems]);
