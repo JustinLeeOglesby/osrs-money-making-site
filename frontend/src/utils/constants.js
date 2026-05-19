@@ -24,6 +24,9 @@ export const ROGUES_PRIORITY_LIMIT_MAX = 125;
 export const ROGUES_LIST_STORAGE_KEY = 'osrs-margin-rogues-list';
 export const ROGUES_LAB_STORAGE_KEY = 'osrs-margin-rogues-lab-picks';
 export const ROGUES_LAB_SETTINGS_KEY = 'osrs-margin-rogues-lab-settings';
+// Per-item stock + sells/session tracking, used by the Stock Equalizer
+// section of the Running List tab. Shape: { [item_id]: { qty, n } }
+export const ROGUES_STOCKS_STORAGE_KEY = 'osrs-margin-rogues-stocks';
 // Items with hourly volume below this are flagged as "thin liquidity" so the
 // user can spot rec'd picks that look juicy on paper but won't fill.
 // (This is the default — the lab UI lets the user override it.)

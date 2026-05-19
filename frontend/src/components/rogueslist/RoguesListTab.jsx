@@ -8,6 +8,7 @@ import {
   ROGUES_LAB_DEFAULTS,
 } from '../../utils/constants';
 import { computeRoguesMetrics } from '../../utils/rogues';
+import StockEqualizer from './StockEqualizer';
 
 // Rogues' Den Running List.
 //
@@ -128,6 +129,9 @@ export default function RoguesListTab() {
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
   const [showFallbacks, setShowFallbacks] = useState(false);
+  // Stock equalizer is heavy (table of editable inputs); keep it folded
+  // away until the user explicitly opens it.
+  const [showEqualizer, setShowEqualizer] = useState(false);
 
   // We read settings on every render so changes from the lab propagate
   // (no cross-tab listener needed; the user has to refresh anyway).
@@ -280,6 +284,13 @@ export default function RoguesListTab() {
           >
             {showFallbacks ? 'Hide' : 'Show'} fallbacks
           </button>
+          <button
+            className={`range-btn ${showEqualizer ? 'active' : ''}`}
+            onClick={() => setShowEqualizer((v) => !v)}
+            title="Open the Stock Equalizer — calculate how many of each item to buy so they all have the same number of sessions remaining"
+          >
+            🧮 {showEqualizer ? 'Hide' : 'Stock'} equalizer
+          </button>
         </div>
 
         {searchResults.length > 0 && (
@@ -322,6 +333,17 @@ export default function RoguesListTab() {
         onRowClick={(row) => openItemModal(row.id)}
         maxSells={maxSells}
       />
+
+      {/* === Stock equalizer (collapsible) === */}
+      {showEqualizer && (
+        <div style={{ marginTop: '2em' }}>
+          <StockEqualizer
+            items={listItems}
+            byId={byId}
+            defaultSellsPerSession={maxSells}
+          />
+        </div>
+      )}
 
       {/* === Priority recommendations === */}
       <div className="alch-header" style={{ marginTop: '2em' }}>
