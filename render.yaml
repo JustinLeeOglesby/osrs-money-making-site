@@ -40,3 +40,11 @@ services:
         fromDatabase:
           name: osrs-margin-sync-db
           property: connectionString
+      # ANTHROPIC_API_KEY — set via Render dashboard (not committed). Powers
+      # the inventory-screenshot OCR endpoint. The app degrades gracefully
+      # to 503 on OCR routes when this is missing; everything else works.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      # Override the default Claude model (claude-haiku-4-5) here if desired.
+      - key: ANTHROPIC_MODEL
+        sync: false

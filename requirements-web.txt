@@ -9,3 +9,7 @@ gunicorn>=21.0.0
 # Cross-device sync (Postgres-backed key/value store keyed by passphrase hash).
 # psycopg2-binary ships a precompiled wheel so Render's build doesn't need a C compiler.
 psycopg2-binary>=2.9.0
+# Inventory-screenshot OCR via Claude vision. Optional — endpoints 503
+# gracefully when ANTHROPIC_API_KEY isn't set, so the rest of the app
+# works fine without it.
+anthropic>=0.40.0

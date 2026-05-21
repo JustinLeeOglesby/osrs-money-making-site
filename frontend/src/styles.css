@@ -454,6 +454,29 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
   background: rgba(109, 167, 231, 0.04);
 }
 .stock-equalizer .alch-header { margin-bottom: 0.5em; }
+
+/* OCR upload panel inside the equalizer. */
+.ocr-panel {
+  background: rgba(109, 167, 231, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.6em 0.8em;
+  margin-bottom: 0.8em;
+}
+.ocr-panel-header { display: flex; align-items: center; flex-wrap: wrap; }
+.ocr-panel-body { margin-top: 0.6em; }
+.ocr-controls { display: flex; gap: 0.4em; align-items: center; flex-wrap: wrap; }
+.ocr-preview-wrap {
+  margin-top: 0.6em;
+  display: inline-block;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 4px;
+  border-radius: 4px;
+  max-width: 100%;
+}
+.ocr-preview { max-width: 320px; max-height: 280px; display: block; }
+.ocr-result { margin-top: 0.6em; }
 .rogues-toggle {
   background: none; border: none; padding: 0 0.5em 0 0; margin: 0;
   cursor: pointer; font-size: 0.95em; line-height: 1;

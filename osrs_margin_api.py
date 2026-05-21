@@ -28,6 +28,14 @@ except ImportError:  # pragma: no cover - local dev without sync
     psycopg2 = None
     RealDictCursor = None
 
+# Anthropic SDK is optional — only needed for the inventory-screenshot OCR
+# endpoint. If the SDK isn't installed or ANTHROPIC_API_KEY isn't set, the
+# OCR endpoints 503 and the rest of the app works as normal.
+try:
+    from anthropic import Anthropic  # type: ignore
+except ImportError:  # pragma: no cover - local dev without OCR
+    Anthropic = None
+
 from osrs_herb_margins import (
     BASE_URL,
     HEADERS,
@@ -1372,6 +1380,168 @@ def sync_post(phash: str):
 def sync_status():
     """Frontend probe — tells the UI whether sync is available on this server."""
     return jsonify({"enabled": _sync_enabled()})
+
+
+# ---------------------------------------------------------------------------
+# Inventory OCR — accepts an OSRS inventory screenshot, calls Claude vision,
+# returns a structured list of {name, quantity} entries that the Stock
+# Equalizer can use to auto-fill quantities.
+# ---------------------------------------------------------------------------
+
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5")
+# Cap inbound base64 image size at ~5MB encoded (Anthropic's effective limit).
+OCR_MAX_BASE64_BYTES = 7_000_000
+_anthropic_client = None
+
+
+def _ocr_enabled() -> bool:
+    return Anthropic is not None and ANTHROPIC_API_KEY is not None
+
+
+def _get_anthropic():
+    global _anthropic_client
+    if _anthropic_client is None and _ocr_enabled():
+        _anthropic_client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    return _anthropic_client
+
+
+# Structured-output schema. Claude returns this via tool use so we get
+# guaranteed parsable JSON, no regex/heuristics on free-form text.
+_OCR_TOOL_SCHEMA = {
+    "name": "report_inventory",
+    "description": (
+        "Report each item visible in the OSRS inventory screenshot. "
+        "Use the exact in-game item name and expand any OSRS number "
+        "abbreviations (10K, 1.5M, 1B) into integers."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "items": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": (
+                                "Exact OSRS item name as it would appear in the GE "
+                                "(e.g. 'Dragon arrowtips', 'Headless arrow', 'Rune arrow')."
+                            ),
+                        },
+                        "quantity": {
+                            "type": "integer",
+                            "description": (
+                                "Stack count as an integer. OSRS uses abbreviations: "
+                                "'10K' -> 10000, '1.5M' -> 1500000, '1B' -> 1000000000. "
+                                "An item with no visible number = 1."
+                            ),
+                            "minimum": 1,
+                        },
+                        "slot": {
+                            "type": "integer",
+                            "description": (
+                                "1-indexed inventory slot (1-28), left to right, top to bottom. "
+                                "Optional — include only if you can clearly determine position."
+                            ),
+                        },
+                        "confidence": {
+                            "type": "string",
+                            "enum": ["high", "medium", "low"],
+                            "description": (
+                                "high = item icon and number both crisp; "
+                                "medium = some ambiguity; "
+                                "low = guessed or partially obscured."
+                            ),
+                        },
+                    },
+                    "required": ["name", "quantity"],
+                },
+            },
+        },
+        "required": ["items"],
+    },
+}
+
+_OCR_PROMPT = (
+    "This is a screenshot of an Old School RuneScape inventory. "
+    "For every visible item, return its name and stack quantity via the "
+    "report_inventory tool. Use exact OSRS item names so they match GE listings. "
+    "Expand abbreviated numbers (10K, 1.5M, 1B). If an item icon has no visible "
+    "stack number, the quantity is 1. Mark each entry's confidence based on "
+    "icon clarity and number legibility. Do not invent items — only report "
+    "what you can actually see."
+)
+
+
+@app.route("/api/ocr/status")
+def ocr_status():
+    """Frontend probe — tells the UI whether OCR is available."""
+    return jsonify({"enabled": _ocr_enabled(), "model": ANTHROPIC_MODEL if _ocr_enabled() else None})
+
+
+@app.route("/api/ocr/inventory", methods=["POST"])
+def ocr_inventory():
+    if not _ocr_enabled():
+        return jsonify({"error": "OCR not configured on this server (set ANTHROPIC_API_KEY)"}), 503
+
+    body = request.get_json(silent=True) or {}
+    image_b64 = body.get("image")
+    if not image_b64 or not isinstance(image_b64, str):
+        return jsonify({"error": "missing image"}), 400
+    # Tolerate data-URL prefix from the frontend's FileReader output.
+    if image_b64.startswith("data:"):
+        try:
+            header, image_b64 = image_b64.split(",", 1)
+        except ValueError:
+            return jsonify({"error": "malformed data URL"}), 400
+    if len(image_b64) > OCR_MAX_BASE64_BYTES:
+        return jsonify({"error": "image too large (>5MB)"}), 413
+
+    media_type = body.get("media_type") or "image/png"
+    if media_type not in ("image/png", "image/jpeg", "image/webp", "image/gif"):
+        return jsonify({"error": f"unsupported media type: {media_type}"}), 400
+
+    client = _get_anthropic()
+    try:
+        resp = client.messages.create(
+            model=ANTHROPIC_MODEL,
+            max_tokens=4096,
+            tools=[_OCR_TOOL_SCHEMA],
+            tool_choice={"type": "tool", "name": "report_inventory"},
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": media_type,
+                                "data": image_b64,
+                            },
+                        },
+                        {"type": "text", "text": _OCR_PROMPT},
+                    ],
+                }
+            ],
+        )
+    except Exception as e:  # broad — surface upstream errors to the UI
+        return jsonify({"error": f"Anthropic API error: {e}"}), 502
+
+    # Pull the tool_use block out. There should be exactly one given we forced tool_choice.
+    for block in resp.content:
+        if getattr(block, "type", None) == "tool_use" and block.name == "report_inventory":
+            return jsonify(
+                {
+                    "items": block.input.get("items", []),
+                    "model": ANTHROPIC_MODEL,
+                    "inputTokens": resp.usage.input_tokens,
+                    "outputTokens": resp.usage.output_tokens,
+                }
+            )
+    return jsonify({"error": "no tool_use block in response"}), 502
 
 
 if SERVE_FRONTEND:

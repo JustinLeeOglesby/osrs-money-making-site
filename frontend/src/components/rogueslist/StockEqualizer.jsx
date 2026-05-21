@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fmtGp } from '../../utils/format';
 import { ROGUES_STOCKS_STORAGE_KEY } from '../../utils/constants';
+import { fetchOcrStatus, ocrInventory } from '../../api/client';
 
 // Stock Equalizer — small calculator for the user's curated Rogues' Den
 // running list.
@@ -41,6 +42,25 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
   const [stocks, setStocks] = useState(loadStocks);
   // Override the auto-computed target. null = "use the auto max."
   const [targetOverride, setTargetOverride] = useState('');
+  // OCR feature toggles + state. Hidden entirely if backend says OCR isn't
+  // configured (no ANTHROPIC_API_KEY). Otherwise: a small panel above the
+  // equalizer table with file picker, preview, extracted-items review, and
+  // apply-to-equalizer button.
+  const [ocrAvailable, setOcrAvailable] = useState(false);
+  const [ocrOpen, setOcrOpen] = useState(false);
+  const [ocrPreview, setOcrPreview] = useState(null);     // data URL for thumbnail
+  const [ocrMediaType, setOcrMediaType] = useState(null); // 'image/png' etc.
+  const [ocrExtracting, setOcrExtracting] = useState(false);
+  const [ocrResult, setOcrResult] = useState(null);       // {items, model, ...}
+  const [ocrError, setOcrError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchOcrStatus()
+      .then((s) => { if (!cancelled) setOcrAvailable(!!s.enabled); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   // Persist on every change.
   useEffect(() => {
@@ -124,6 +144,104 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
     });
   };
 
+  // --- OCR handlers ---
+
+  const handleFile = (e) => {
+    const f = e.target.files?.[0];
+    setOcrError(null);
+    setOcrResult(null);
+    if (!f) {
+      setOcrPreview(null);
+      setOcrMediaType(null);
+      return;
+    }
+    if (!f.type.startsWith('image/')) {
+      setOcrError('Please pick an image file.');
+      return;
+    }
+    setOcrMediaType(f.type);
+    const reader = new FileReader();
+    reader.onload = (ev) => setOcrPreview(ev.target.result);
+    reader.onerror = () => setOcrError('Failed to read file.');
+    reader.readAsDataURL(f);
+  };
+
+  const runOcr = async () => {
+    if (!ocrPreview) return;
+    setOcrExtracting(true);
+    setOcrError(null);
+    setOcrResult(null);
+    try {
+      // Strip "data:image/png;base64," prefix; backend re-adds expected wrapping.
+      const b64 = ocrPreview.split(',', 2)[1] || '';
+      const data = await ocrInventory(b64, ocrMediaType || 'image/png');
+      setOcrResult(data);
+    } catch (err) {
+      setOcrError(err.message || 'OCR failed');
+    } finally {
+      setOcrExtracting(false);
+    }
+  };
+
+  // Fuzzy-match extracted item name → running list item id.
+  // Returns the matched list item or null.
+  const matchToListItem = (extractedName) => {
+    if (!extractedName) return null;
+    const needle = extractedName.toLowerCase().trim();
+    // Exact case-insensitive first
+    let hit = items.find((it) => (it.name || '').toLowerCase() === needle);
+    if (hit) return hit;
+    // Strip "(p)", "(p++)", "(unf)", etc. variations on both sides
+    const strip = (s) => s.replace(/\s*\([^)]*\)/g, '').trim();
+    const needleStripped = strip(needle);
+    hit = items.find((it) => strip((it.name || '').toLowerCase()) === needleStripped);
+    return hit || null;
+  };
+
+  // Build a per-extracted-row review entry with matched id (if any).
+  const ocrReview = useMemo(() => {
+    if (!ocrResult?.items) return [];
+    return ocrResult.items.map((entry, idx) => {
+      const match = matchToListItem(entry.name);
+      return {
+        idx,
+        name: entry.name,
+        quantity: entry.quantity ?? 0,
+        confidence: entry.confidence || null,
+        slot: entry.slot ?? null,
+        matchedId: match?.id ?? null,
+        matchedName: match?.name ?? null,
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ocrResult, items]);
+
+  const applyOcrToStocks = () => {
+    if (!ocrReview.length) return;
+    setStocks((prev) => {
+      const next = { ...prev };
+      for (const r of ocrReview) {
+        if (r.matchedId == null) continue;
+        next[r.matchedId] = {
+          ...(next[r.matchedId] || {}),
+          qty: r.quantity,
+        };
+      }
+      return next;
+    });
+    // Keep the result visible briefly so the user can confirm; clear preview
+    // so the file input is re-usable.
+    setOcrPreview(null);
+    setOcrMediaType(null);
+  };
+
+  const clearOcr = () => {
+    setOcrPreview(null);
+    setOcrMediaType(null);
+    setOcrResult(null);
+    setOcrError(null);
+  };
+
   return (
     <div className="stock-equalizer">
       <div className="alch-header">
@@ -174,6 +292,114 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
           </button>
         </div>
       </div>
+
+      {/* === OCR upload panel (collapsible, hidden when backend doesn't have API key) === */}
+      {ocrAvailable && (
+        <div className="ocr-panel">
+          <div className="ocr-panel-header">
+            <button
+              className="range-btn"
+              onClick={() => setOcrOpen((v) => !v)}
+              title="Upload an OSRS inventory screenshot and auto-fill the quantities below"
+            >
+              📷 {ocrOpen ? 'Hide' : 'Upload screenshot'} (auto-fill via OCR)
+            </button>
+            {ocrOpen && (
+              <span style={{ marginLeft: '0.8em', color: 'var(--muted)', fontSize: '0.85em' }}>
+                Drop or pick an inventory screenshot — Claude vision extracts item names + quantities
+              </span>
+            )}
+          </div>
+          {ocrOpen && (
+            <div className="ocr-panel-body">
+              <div className="ocr-controls">
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleFile}
+                />
+                <button
+                  className="range-btn"
+                  onClick={runOcr}
+                  disabled={!ocrPreview || ocrExtracting}
+                >
+                  {ocrExtracting ? 'Extracting…' : 'Extract'}
+                </button>
+                {(ocrPreview || ocrResult) && (
+                  <button className="range-btn" onClick={clearOcr}>Clear</button>
+                )}
+              </div>
+              {ocrPreview && (
+                <div className="ocr-preview-wrap">
+                  <img src={ocrPreview} alt="Inventory preview" className="ocr-preview" />
+                </div>
+              )}
+              {ocrError && (
+                <div style={{ color: 'var(--red)', fontSize: '0.9em', padding: '0.4em 0' }}>
+                  {ocrError}
+                </div>
+              )}
+              {ocrResult && (
+                <div className="ocr-result">
+                  <div style={{ marginBottom: '0.5em' }}>
+                    <strong>Extracted {ocrReview.length} items</strong>
+                    {' '} (model: {ocrResult.model}, {ocrResult.inputTokens}+{ocrResult.outputTokens} tokens)
+                  </div>
+                  <table className="alch-table bounded-table">
+                    <thead>
+                      <tr>
+                        <th className="left">Extracted name</th>
+                        <th className="right">Qty</th>
+                        <th className="left">Match in running list</th>
+                        <th className="right">Confidence</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ocrReview.map((r) => (
+                        <tr key={r.idx}>
+                          <td className="left">{r.name}</td>
+                          <td className="right">{r.quantity.toLocaleString()}</td>
+                          <td
+                            className="left"
+                            style={{ color: r.matchedId ? 'var(--green)' : 'var(--muted)' }}
+                          >
+                            {r.matchedId ? `✓ ${r.matchedName}` : '— not on your running list'}
+                          </td>
+                          <td
+                            className="right"
+                            style={{
+                              color:
+                                r.confidence === 'high'
+                                  ? 'var(--green)'
+                                  : r.confidence === 'low'
+                                    ? '#f3c54a'
+                                    : 'var(--muted)',
+                            }}
+                          >
+                            {r.confidence || '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div style={{ marginTop: '0.6em', display: 'flex', gap: '0.4em' }}>
+                    <button
+                      className="range-btn"
+                      onClick={applyOcrToStocks}
+                      disabled={ocrReview.every((r) => r.matchedId == null)}
+                    >
+                      Apply quantities to equalizer
+                    </button>
+                    <span style={{ alignSelf: 'center', color: 'var(--muted)', fontSize: '0.85em' }}>
+                      Only matched items fill in; unmatched rows are ignored.
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {rows.length === 0 ? (
         <div className="lab-panel-empty">
