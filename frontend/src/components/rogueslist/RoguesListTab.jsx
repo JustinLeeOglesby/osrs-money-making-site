@@ -9,6 +9,25 @@ import {
 } from '../../utils/constants';
 import { computeRoguesMetrics } from '../../utils/rogues';
 import StockEqualizer from './StockEqualizer';
+import { ROGUES_STOCKS_STORAGE_KEY } from '../../utils/constants';
+
+// Per-item stock + N storage shared with the StockEqualizer. Lifting this
+// state into the tab lets both the running list (which uses N for profit
+// math) and the equalizer table edit the same map. Persisted via the
+// storage key already in SYNCED_KEYS so changes propagate across devices.
+function loadStocks() {
+  try {
+    const raw = localStorage.getItem(ROGUES_STOCKS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+function parseInt0(v) {
+  if (v === '' || v == null) return 0;
+  const n = Math.floor(Number(v));
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
 
 // Rogues' Den Running List.
 //
@@ -145,6 +164,23 @@ export default function RoguesListTab() {
   const { items: listItems, add, remove, count } = useRoguesList();
   const { open: openItemModal } = useItemModal();
 
+  // Shared per-item {qty, n} state for the running list + equalizer.
+  const [stocks, setStocks] = useState(loadStocks);
+  useEffect(() => {
+    try {
+      localStorage.setItem(ROGUES_STOCKS_STORAGE_KEY, JSON.stringify(stocks));
+    } catch {
+      /* session-only fallback */
+    }
+  }, [stocks]);
+  const updateItemN = (id, val) => {
+    const n = parseInt0(val);
+    setStocks((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), n } }));
+  };
+  // Get the effective N for an item — per-item override if set, otherwise
+  // the global default from lab settings.
+  const effectiveN = (id) => stocks[id]?.n ?? maxSells;
+
   const load = () => {
     setRefreshing(true);
     setError(null);
@@ -162,21 +198,26 @@ export default function RoguesListTab() {
   const listIdSet = useMemo(() => new Set(listItems.map((it) => it.id)), [listItems]);
 
   // Hydrate each list item with live data + recomputed-at-user-N metrics.
+  // N comes from the per-item stocks map (set in the equalizer or the
+  // running list's inline input), falling back to the global maxSells when
+  // the item has no per-row override.
   const listRows = useMemo(() => {
     return listItems.map((it) => {
       const live = byId.get(it.id);
+      const n = stocks[it.id]?.n ?? maxSells;
       const metrics = live
-        ? computeRoguesMetrics(live.highalch, live.buyPrice, maxSells, live.dailyVolumePerHr || 0)
+        ? computeRoguesMetrics(live.highalch, live.buyPrice, n, live.dailyVolumePerHr || 0)
         : null;
       return {
         id: it.id,
         name: live?.name || it.name,
         live,
         metrics,
-        status: statusFor(live, maxSells, anomalyPct),
+        n,
+        status: statusFor(live, n, anomalyPct),
       };
     });
-  }, [listItems, byId, maxSells, anomalyPct]);
+  }, [listItems, byId, stocks, maxSells, anomalyPct]);
 
   // Throughput math + coverage. Daily supply = sum of per-item daily limits.
   const throughput = dailySellThroughput(hoursActive, maxSells, efficiency);
@@ -331,7 +372,7 @@ export default function RoguesListTab() {
           </button>
         )}
         onRowClick={(row) => openItemModal(row.id)}
-        maxSells={maxSells}
+        onUpdateN={updateItemN}
       />
 
       {/* === Stock equalizer (collapsible) === */}
@@ -341,6 +382,8 @@ export default function RoguesListTab() {
             items={listItems}
             byId={byId}
             defaultSellsPerSession={maxSells}
+            stocks={stocks}
+            setStocks={setStocks}
           />
         </div>
       )}
@@ -389,35 +432,97 @@ export default function RoguesListTab() {
 // Pool table: the user's running list
 // ---------------------------------------------------------------------------
 
-function PoolTable({ title, rows, emptyMessage, renderActions, onRowClick, maxSells }) {
+function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN }) {
+  // Default sort: by profit/session descending so the highest-margin picks
+  // float to the top.
+  const [sortKey, setSortKey] = useState('profit');
+  const [sortDir, setSortDir] = useState('desc');
+
+  const get = (r, key) => {
+    const live = r.live;
+    const m = r.metrics;
+    switch (key) {
+      case 'name':         return (r.name || '').toLowerCase();
+      case 'limit':        return live?.limit ?? -1;
+      case 'buyPrice':     return live?.buyPrice ?? -1;
+      case 'n':            return r.n ?? 0;
+      case 'profit':       return m?.profitPerSession ?? -Infinity;
+      case 'dailyCeiling': {
+        if (!live?.limit || !m || !m.sellsPerSession) return -Infinity;
+        return (m.profitPerSession / m.sellsPerSession) * live.limit * 4;
+      }
+      default: return 0;
+    }
+  };
+
+  const sorted = useMemo(() => {
+    const getter = (r) => get(r, sortKey);
+    const nameGet = (r) => get(r, 'name');
+    return [...rows].sort((a, b) => {
+      const va = getter(a);
+      const vb = getter(b);
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      const na = nameGet(a);
+      const nb = nameGet(b);
+      if (na < nb) return -1;
+      if (na > nb) return 1;
+      return 0;
+    });
+  }, [rows, sortKey, sortDir]);
+
+  const toggleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir(key === 'name' ? 'asc' : 'desc');
+    }
+  };
+  const arrow = (key) =>
+    sortKey === key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '';
+
   return (
     <div className="table-scroll">
       <table className="alch-table bounded-table">
         <thead>
           <tr>
             <th style={{ width: '2.5em' }} />
-            <th className="left">Item</th>
-            <th className="right">Buy limit</th>
-            <th className="right">Buy price</th>
-            <th className="right">Profit / {maxSells}-item session</th>
-            <th className="right">Daily ceiling (4× limit)</th>
+            <th className={`left ${sortKey === 'name' ? 'sorted' : ''}`} onClick={() => toggleSort('name')}>
+              Item{arrow('name')}
+            </th>
+            <th className={`right ${sortKey === 'limit' ? 'sorted' : ''}`} onClick={() => toggleSort('limit')}>
+              Buy limit{arrow('limit')}
+            </th>
+            <th className={`right ${sortKey === 'buyPrice' ? 'sorted' : ''}`} onClick={() => toggleSort('buyPrice')}>
+              Buy price{arrow('buyPrice')}
+            </th>
+            <th className={`right ${sortKey === 'n' ? 'sorted' : ''}`} onClick={() => toggleSort('n')}>
+              Sells / session{arrow('n')}
+            </th>
+            <th className={`right ${sortKey === 'profit' ? 'sorted' : ''}`} onClick={() => toggleSort('profit')}>
+              Profit / session{arrow('profit')}
+            </th>
+            <th className={`right ${sortKey === 'dailyCeiling' ? 'sorted' : ''}`} onClick={() => toggleSort('dailyCeiling')}>
+              Daily ceiling{arrow('dailyCeiling')}
+            </th>
             <th />
           </tr>
         </thead>
         <tbody>
-          {rows.length === 0 && (
+          {sorted.length === 0 && (
             <tr>
-              <td colSpan={7} style={{ padding: '1.5em', color: 'var(--muted)', textAlign: 'center' }}>
+              <td colSpan={8} style={{ padding: '1.5em', color: 'var(--muted)', textAlign: 'center' }}>
                 {emptyMessage}
               </td>
             </tr>
           )}
-          {rows.map((row) => {
-            const { id, name, live, metrics, status } = row;
+          {sorted.map((row) => {
+            const { id, name, live, metrics, status, n } = row;
             const profit = metrics?.profitPerSession ?? 0;
             const buyLimit = live?.limit ?? null;
             const buyPrice = live?.buyPrice ?? null;
-            const dailyCeiling = buyLimit && metrics
+            const dailyCeiling = buyLimit && metrics && metrics.sellsPerSession
               ? (metrics.profitPerSession / metrics.sellsPerSession) * buyLimit * 4
               : null;
             return (
@@ -430,6 +535,26 @@ function PoolTable({ title, rows, emptyMessage, renderActions, onRowClick, maxSe
                 <td className="left">{name}</td>
                 <td className="right">{buyLimit?.toLocaleString() ?? '—'}</td>
                 <td className="right">{buyPrice != null ? fmtGp(buyPrice) : '—'}</td>
+                <td className="right" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="text"
+                    value={n ?? ''}
+                    onChange={(e) => onUpdateN(id, e.target.value)}
+                    inputMode="numeric"
+                    title="How many you sell per Rogues' Den session for this item. Drives the profit math."
+                    style={{
+                      width: '4em',
+                      textAlign: 'right',
+                      background: 'var(--bg)',
+                      color: 'var(--text)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 3,
+                      padding: '0.15em 0.4em',
+                      fontFamily: 'inherit',
+                      fontSize: '0.95em',
+                    }}
+                  />
+                </td>
                 <td className="right" style={{ color: profitColor(profit), fontWeight: 600 }}>
                   {metrics ? fmtGp(profit) : '—'}
                 </td>

@@ -22,6 +22,8 @@ import { fetchOcrStatus, ocrInventory } from '../../api/client';
 // Persists to localStorage with key ROGUES_STOCKS_STORAGE_KEY — synced via
 // SyncContext so the inventory state follows the user across devices.
 
+// Fallback loader when used outside RoguesListTab (the parent passes stocks
+// and setStocks in via props; we read once on mount only if those are absent).
 function loadStocks() {
   try {
     const raw = localStorage.getItem(ROGUES_STOCKS_STORAGE_KEY);
@@ -38,8 +40,28 @@ function parseInt0(v) {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
-export default function StockEqualizer({ items, byId, defaultSellsPerSession = 20 }) {
-  const [stocks, setStocks] = useState(loadStocks);
+export default function StockEqualizer({
+  items,
+  byId,
+  defaultSellsPerSession = 20,
+  stocks: stocksProp,
+  setStocks: setStocksProp,
+}) {
+  // If the parent passes stocks state in, we use it (controlled). Otherwise
+  // fall back to local state with localStorage persistence so the component
+  // still works in isolation.
+  const [localStocks, setLocalStocks] = useState(loadStocks);
+  const stocks = stocksProp ?? localStocks;
+  const setStocks = setStocksProp ?? setLocalStocks;
+  // Persist only when running uncontrolled (controlled parent owns persistence).
+  useEffect(() => {
+    if (setStocksProp) return; // controlled, parent handles writes
+    try {
+      localStorage.setItem(ROGUES_STOCKS_STORAGE_KEY, JSON.stringify(localStocks));
+    } catch {
+      /* session-only fallback */
+    }
+  }, [localStocks, setStocksProp]);
   // Override the auto-computed target. null = "use the auto max."
   const [targetOverride, setTargetOverride] = useState('');
   // Sort + filter state for the equalizer table. Default: items most in need
@@ -70,15 +92,6 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
       .catch(() => {});
     return () => { cancelled = true; };
   }, []);
-
-  // Persist on every change.
-  useEffect(() => {
-    try {
-      localStorage.setItem(ROGUES_STOCKS_STORAGE_KEY, JSON.stringify(stocks));
-    } catch {
-      /* session-only fallback */
-    }
-  }, [stocks]);
 
   // For each list item, gather inputs + live data into a derived row.
   const rows = useMemo(() => {
