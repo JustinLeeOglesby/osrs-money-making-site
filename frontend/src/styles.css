@@ -455,6 +455,28 @@ h1 { margin: 0 0 0.4em; font-size: 1.15em; font-weight: 600; }
 }
 .stock-equalizer .alch-header { margin-bottom: 0.5em; }
 
+/* Swap suggestions on the running list — each card lays out remove/add
+   in one line with the profit+stability gain summary and an apply button. */
+.swap-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  margin-top: 0.4em;
+}
+.swap-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  border-radius: 4px;
+  padding: 0.6em 0.9em;
+  flex-wrap: wrap;
+}
+.swap-suggestion-text { flex: 1 1 auto; min-width: 240px; font-size: 0.92em; }
+.swap-suggestion-gain { font-size: 0.85em; flex: 0 0 auto; }
+
 /* OCR upload panel inside the equalizer. */
 .ocr-panel {
   background: rgba(109, 167, 231, 0.05);

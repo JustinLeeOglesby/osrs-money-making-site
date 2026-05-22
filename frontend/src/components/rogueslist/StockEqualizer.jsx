@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { fmtGp } from '../../utils/format';
 import { ROGUES_STOCKS_STORAGE_KEY, ROGUES_EQUALIZER_TARGET_KEY } from '../../utils/constants';
 import { fetchOcrStatus, ocrInventory } from '../../api/client';
@@ -160,7 +160,7 @@ export default function StockEqualizer({
     }
   };
 
-  const displayed = useMemo(() => {
+  const sorted = useMemo(() => {
     let list = enriched;
     if (hideSatisfied) list = list.filter((r) => r.need > 0);
     const get = sortGetter(sortKey);
@@ -178,6 +178,44 @@ export default function StockEqualizer({
       return 0;
     });
   }, [enriched, sortKey, sortDir, hideSatisfied]);
+
+  // Freeze-on-focus: hold the row order steady while the user is editing
+  // an input cell, so the row they're typing into doesn't jump out from
+  // under them. Released ~250ms after the last input blur.
+  const [frozenOrder, setFrozenOrder] = useState(null);
+  const blurTimerRef = useRef(null);
+  const handleInputFocus = () => {
+    if (blurTimerRef.current) {
+      clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
+    if (!frozenOrder) setFrozenOrder(sorted.map((r) => r.id));
+  };
+  const handleInputBlur = () => {
+    if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+    blurTimerRef.current = setTimeout(() => {
+      setFrozenOrder(null);
+      blurTimerRef.current = null;
+    }, 250);
+  };
+  useEffect(() => () => {
+    if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+  }, []);
+
+  const displayed = useMemo(() => {
+    if (!frozenOrder) return sorted;
+    const byIdMap = new Map(sorted.map((r) => [r.id, r]));
+    const out = [];
+    const seen = new Set();
+    for (const id of frozenOrder) {
+      const r = byIdMap.get(id);
+      if (r) { out.push(r); seen.add(id); }
+    }
+    for (const r of sorted) {
+      if (!seen.has(r.id)) out.push(r);
+    }
+    return out;
+  }, [sorted, frozenOrder]);
 
   // Header click → toggle direction if same column, else switch to it
   // with a sensible default (name → asc, everything else → desc).
@@ -612,6 +650,8 @@ export default function StockEqualizer({
                         type="text"
                         value={r.n}
                         onChange={(e) => updateN(r.id, e.target.value)}
+                        onFocus={handleInputFocus}
+                        onBlur={handleInputBlur}
                         inputMode="numeric"
                         style={{
                           width: '4em',
@@ -631,6 +671,8 @@ export default function StockEqualizer({
                         type="text"
                         value={r.qty}
                         onChange={(e) => updateQty(r.id, e.target.value)}
+                        onFocus={handleInputFocus}
+                        onBlur={handleInputBlur}
                         inputMode="numeric"
                         style={{
                           width: '5em',

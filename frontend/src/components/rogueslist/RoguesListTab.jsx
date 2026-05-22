@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { fmtGp, profitColor } from '../../utils/format';
 import { fetchHighAlch } from '../../api/client';
 import { useRoguesList } from '../../context/RoguesListContext';
@@ -6,6 +6,7 @@ import { useItemModal } from '../../context/ItemModalContext';
 import {
   ROGUES_LAB_SETTINGS_KEY,
   ROGUES_LAB_DEFAULTS,
+  ROGUES_LIST_MAX,
 } from '../../utils/constants';
 import { computeRoguesMetrics } from '../../utils/rogues';
 import StockEqualizer from './StockEqualizer';
@@ -186,7 +187,18 @@ export default function RoguesListTab() {
   const priorityLimitMax = settings.priorityLimitMax ?? 125;
   const anomalyPct = settings.anomalyPct ?? 15;
 
-  const { items: listItems, add, remove, count } = useRoguesList();
+  const {
+    items: listItems,
+    mainItems,
+    backupItems,
+    add,
+    remove,
+    promote,
+    demote,
+    mainCount,
+    backupCount,
+    isFull,
+  } = useRoguesList();
   const { open: openItemModal } = useItemModal();
 
   // Shared per-item {qty, n} state for the running list + equalizer.
@@ -243,13 +255,13 @@ export default function RoguesListTab() {
   // N comes from the per-item stocks map (set in the equalizer or the
   // running list's inline input), falling back to the global maxSells when
   // the item has no per-row override.
-  const listRows = useMemo(() => {
-    return listItems.map((it) => {
+  // Build display rows for a given source array (mainItems or backupItems).
+  // Same enrichment logic — just parameterized by which subset.
+  const buildRows = useCallback((source) => {
+    return source.map((it) => {
       const live = byId.get(it.id);
       const n = stocks[it.id]?.n ?? maxSells;
       const override = stocks[it.id]?.buyOverride;
-      // Effective buy price feeds all the math. If the user has overridden,
-      // their value wins; otherwise live wins; otherwise null (no math).
       const effectiveBuyPrice = override ?? live?.buyPrice ?? null;
       const metrics = live && live.highalch && effectiveBuyPrice
         ? computeRoguesMetrics(live.highalch, effectiveBuyPrice, n, live.dailyVolumePerHr || 0)
@@ -265,7 +277,18 @@ export default function RoguesListTab() {
         status: statusFor({ ...live, buyPrice: effectiveBuyPrice }, n, anomalyPct),
       };
     });
-  }, [listItems, byId, stocks, maxSells, anomalyPct]);
+  }, [byId, stocks, maxSells, anomalyPct]);
+
+  const mainRows = useMemo(() => buildRows(mainItems), [mainItems, buildRows]);
+  const backupRows = useMemo(() => buildRows(backupItems), [backupItems, buildRows]);
+  // Kept for the equalizer + diff stats: combined list of all tracked items.
+  const listRows = useMemo(() => [...mainRows, ...backupRows], [mainRows, backupRows]);
+
+  // Total expected profit if you cycle through every main-list item once at
+  // its preferred N. The user's "I burned through one full rotation" number.
+  const totalProfitPerCycle = useMemo(() => {
+    return mainRows.reduce((sum, r) => sum + (r.metrics?.profitPerSession || 0), 0);
+  }, [mainRows]);
 
   // Throughput math + coverage. Daily supply = sum of per-item daily limits.
   const throughput = dailySellThroughput(hoursActive, maxSells, efficiency);
@@ -306,6 +329,100 @@ export default function RoguesListTab() {
       .slice(0, PRIORITY_RECS_LIMIT);
   }, [data, listIdSet, maxSells, priorityLimitMax]);
 
+  // ===== Swap suggestions =====
+  // Find candidates that dominate items currently in the main list on BOTH
+  // profit AND stability. Stability is a composite of:
+  //   - low price-vs-24h-avg deviation (item isn't on a momentary spike)
+  //   - daily volume comfortably covers the 4hr buy limit (you can stock it)
+  //   - sustainable profit positive (still works at the 24h baseline price)
+  // The result is up to 5 "remove X, add Y" pairs ranked by absolute profit
+  // gain. Click "Apply swap" and Y takes X's spot in main.
+  const swapSuggestions = useMemo(() => {
+    if (!data || mainRows.length === 0) return [];
+
+    // Score a live row (used for both main items and candidates).
+    const stability = (live) => {
+      if (!live) return 0;
+      let s = 1.0;
+      const vs24h = live.priceVs24hPct ?? 0;
+      // Penalize anomalous prices — falls off linearly to 0 at 50% deviation.
+      s *= Math.max(0, 1 - Math.abs(vs24h) / 50);
+      // Reward sustainable-at-24h-avg items, penalize spike-driven margins.
+      if ((live.sustainableRoguesProfit || 0) > 0) s *= 1.2;
+      else s *= 0.5;
+      // Volume vs buy-limit headroom (4× limit/day vs daily volume)
+      const limit = live.limit || 0;
+      const dailyVolTotal = (live.dailyVolumePerHr || 0) * 24;
+      if (limit > 0 && dailyVolTotal > 0) {
+        const headroom = dailyVolTotal / (limit * 4);
+        if (headroom < 1) s *= 0.5;
+        else if (headroom > 3) s *= 1.1;
+      } else if (limit > 0) {
+        s *= 0.4; // no volume data
+      }
+      return s;
+    };
+
+    // Candidate set: anything not on the list with a small buy limit + good
+    // metrics. Use the priority cutoff so suggestions stay on-strategy.
+    const candidates = data.items
+      .filter((r) => {
+        if (listIdSet.has(r.id)) return false;
+        if (!r.limit || r.limit > priorityLimitMax) return false;
+        const m = computeRoguesMetrics(r.highalch, r.buyPrice, maxSells, r.dailyVolumePerHr || 0);
+        if (!m || m.profitPerSession <= 0) return false;
+        if ((r.sustainableRoguesProfit || 0) <= 0) return false;
+        const dailyVolTotal = (r.dailyVolumePerHr || 0) * 24;
+        if (dailyVolTotal < r.limit * 2) return false;
+        return true;
+      })
+      .map((r) => {
+        const m = computeRoguesMetrics(r.highalch, r.buyPrice, maxSells, r.dailyVolumePerHr || 0);
+        return {
+          row: r,
+          profit: m?.profitPerSession || 0,
+          stability: stability(r),
+        };
+      });
+
+    // For each main row, find the best candidate that beats it on both axes.
+    const suggestions = [];
+    for (const m of mainRows) {
+      if (!m.live || !m.metrics) continue;
+      const mProfit = m.metrics.profitPerSession;
+      if (mProfit <= 0) continue;
+      const mStab = stability(m.live);
+      // Candidate must strictly dominate on profit AND stability.
+      const dominators = candidates.filter(
+        (c) => c.profit > mProfit && c.stability > mStab
+      );
+      if (dominators.length === 0) continue;
+      // Pick the candidate with highest profit (the user's primary axis).
+      const best = dominators.sort((a, b) => b.profit - a.profit)[0];
+      suggestions.push({
+        removeId: m.id,
+        removeName: m.name,
+        removeProfit: mProfit,
+        removeStability: mStab,
+        addRow: best.row,
+        addProfit: best.profit,
+        addStability: best.stability,
+        profitGain: best.profit - mProfit,
+        stabilityGain: best.stability - mStab,
+      });
+    }
+    return suggestions.sort((a, b) => b.profitGain - a.profitGain).slice(0, 5);
+  }, [data, listIdSet, mainRows, maxSells, priorityLimitMax]);
+
+  // Apply a single swap: remove the old item from main, add the candidate
+  // (which lands in main since the slot just opened up).
+  const applySwap = useCallback((s) => {
+    remove(s.removeId);
+    // Defer add to next tick so the remove commits first (otherwise the
+    // add sees main as full and pushes the new item to backup).
+    setTimeout(() => add(s.addRow.id, s.addRow.name), 0);
+  }, [remove, add]);
+
   // Fallback rail: high-volume staples (loose buy limit), always-buyable.
   const fallbacks = useMemo(() => {
     if (!data) return [];
@@ -340,14 +457,31 @@ export default function RoguesListTab() {
       <div className="alch-header">
         {/* === Coverage header === */}
         <div className="alch-summary">
-          <strong>{count} items in your running list</strong> · supplies{' '}
-          <strong>{totalDailySupply.toLocaleString()}</strong> items/day from GE buy limits ·
-          your throughput needs{' '}
+          <strong>
+            Main: {mainCount}/{ROGUES_LIST_MAX}
+          </strong>
+          {backupCount > 0 && (
+            <> · <strong>Backup: {backupCount}</strong></>
+          )}
+          {' '}· supplies{' '}
+          <strong>{totalDailySupply.toLocaleString()}</strong>/day from buy limits ·
+          throughput need{' '}
           <strong>{throughput.toLocaleString()}</strong>/day →{' '}
           <span style={{ color: coverageColor, fontWeight: 600 }}>
-            {coverage.toFixed(2)}× cover ({coverageLabel})
+            {coverage.toFixed(2)}× ({coverageLabel})
           </span>
         </div>
+        {totalProfitPerCycle > 0 && (
+          <div className="alch-summary" style={{ marginTop: '0.3em' }}>
+            <strong>Estimated profit per full rotation:</strong>{' '}
+            <span style={{ color: 'var(--green)', fontWeight: 600 }}>
+              {fmtGp(totalProfitPerCycle)} gp
+            </span>
+            <span style={{ color: 'var(--muted)', fontSize: '0.85em' }}>
+              {' '}— sum of profit/session across your {mainCount} main-list items at their preferred N
+            </span>
+          </div>
+        )}
         <div className="alch-summary" style={{ color: 'var(--muted)', fontSize: '0.85em', marginTop: '0.3em' }}>
           Sized by: {hoursActive}h/day × {maxSells} per session ×{' '}
           {Math.round(efficiency * 100)}% efficiency. Priority cutoff: buy limit ≤ {priorityLimitMax}.
@@ -400,10 +534,14 @@ export default function RoguesListTab() {
         )}
       </div>
 
-      {/* === Running list === */}
+      {/* === Main running list (capped at ROGUES_LIST_MAX) === */}
+      <div className="alch-header" style={{ marginTop: '0.6em' }}>
+        <div className="alch-summary">
+          <strong>Main running list</strong> — your active rotation (capped at {ROGUES_LIST_MAX})
+        </div>
+      </div>
       <PoolTable
-        title="Your running list"
-        rows={listRows}
+        rows={mainRows}
         emptyMessage={
           <>
             Empty. Use the search above, or pick from the Recommendations below
@@ -411,18 +549,115 @@ export default function RoguesListTab() {
           </>
         }
         renderActions={(row) => (
-          <button
-            className="range-btn"
-            onClick={(e) => { e.stopPropagation(); remove(row.id); }}
-            title="Remove from list"
-          >
-            ✕
-          </button>
+          <>
+            <button
+              className="range-btn"
+              onClick={(e) => { e.stopPropagation(); demote(row.id); }}
+              title="Move to backup pool"
+            >
+              ↓ Backup
+            </button>
+            <button
+              className="range-btn"
+              onClick={(e) => { e.stopPropagation(); remove(row.id); }}
+              title="Remove from list entirely"
+              style={{ marginLeft: '0.25em' }}
+            >
+              ✕
+            </button>
+          </>
         )}
         onRowClick={(row) => openItemModal(row.id)}
         onUpdateN={updateItemN}
         onUpdateBuyOverride={updateItemBuyOverride}
       />
+
+      {/* === Swap suggestions (only shown when there are dominators) === */}
+      {swapSuggestions.length > 0 && (
+        <>
+          <div className="alch-header" style={{ marginTop: '1.5em' }}>
+            <div className="alch-summary">
+              <strong>🔁 Swap suggestions</strong> — candidates that beat a main-list item
+              on <em>both</em> profit AND stability (price ≈ 24h baseline, volume covers buy
+              limit, sustainable margin)
+            </div>
+          </div>
+          <div className="swap-suggestions">
+            {swapSuggestions.map((s, i) => (
+              <div key={`swap-${i}`} className="swap-suggestion">
+                <div className="swap-suggestion-text">
+                  <span style={{ color: 'var(--muted)' }}>Remove</span>{' '}
+                  <strong>{s.removeName}</strong>{' '}
+                  <span style={{ color: 'var(--muted)' }}>
+                    ({fmtGp(s.removeProfit)} profit, stability {s.removeStability.toFixed(2)})
+                  </span>
+                  {' → '}
+                  <span style={{ color: 'var(--muted)' }}>Add</span>{' '}
+                  <strong style={{ color: 'var(--green)' }}>{s.addRow.name}</strong>{' '}
+                  <span style={{ color: 'var(--muted)' }}>
+                    ({fmtGp(s.addProfit)} profit, stability {s.addStability.toFixed(2)})
+                  </span>
+                </div>
+                <div className="swap-suggestion-gain">
+                  <span style={{ color: 'var(--green)', fontWeight: 600 }}>
+                    +{fmtGp(s.profitGain)} gp/session
+                  </span>
+                  {' · '}
+                  <span style={{ color: 'var(--muted)' }}>
+                    +{s.stabilityGain.toFixed(2)} stability
+                  </span>
+                </div>
+                <button
+                  className="range-btn"
+                  onClick={() => applySwap(s)}
+                  title={`Remove ${s.removeName} and add ${s.addRow.name}`}
+                >
+                  Apply swap
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* === Backup pool (uncapped) — only render if non-empty === */}
+      {backupRows.length > 0 && (
+        <>
+          <div className="alch-header" style={{ marginTop: '1.5em' }}>
+            <div className="alch-summary">
+              <strong>Backup pool</strong> ({backupCount}) — extra items rotating in and out of
+              the active set. Promote any back to main when there's room.
+            </div>
+          </div>
+          <PoolTable
+            rows={backupRows}
+            emptyMessage="Backup pool is empty."
+            renderActions={(row) => (
+              <>
+                <button
+                  className="range-btn"
+                  onClick={(e) => { e.stopPropagation(); promote(row.id); }}
+                  disabled={isFull}
+                  title={isFull ? `Main is full (${ROGUES_LIST_MAX}). Demote a main item first.` : 'Move to main pool'}
+                >
+                  ↑ Main
+                </button>
+                <button
+                  className="range-btn"
+                  onClick={(e) => { e.stopPropagation(); remove(row.id); }}
+                  title="Remove from list entirely"
+                  style={{ marginLeft: '0.25em' }}
+                >
+                  ✕
+                </button>
+              </>
+            )}
+            onRowClick={(row) => openItemModal(row.id)}
+            onUpdateN={updateItemN}
+            onUpdateBuyOverride={updateItemBuyOverride}
+          />
+        </>
+      )}
 
       {/* === Stock equalizer (collapsible) === */}
       {showEqualizer && (
@@ -487,6 +722,30 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN, o
   const [sortKey, setSortKey] = useState('profit');
   const [sortDir, setSortDir] = useState('desc');
 
+  // Freeze the displayed row order while any input is focused, so the row
+  // the user is editing doesn't jump out from under them. We snapshot the
+  // order on focus and release ~250ms after the last blur (the gap lets a
+  // tab-or-click to the next row's input keep the freeze active).
+  const [frozenOrder, setFrozenOrder] = useState(null);
+  const blurTimerRef = useRef(null);
+  const handleInputFocus = (currentSorted) => () => {
+    if (blurTimerRef.current) {
+      clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
+    if (!frozenOrder) setFrozenOrder(currentSorted.map((r) => r.id));
+  };
+  const handleInputBlur = () => {
+    if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+    blurTimerRef.current = setTimeout(() => {
+      setFrozenOrder(null);
+      blurTimerRef.current = null;
+    }, 250);
+  };
+  useEffect(() => () => {
+    if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+  }, []);
+
   const get = (r, key) => {
     const live = r.live;
     const m = r.metrics;
@@ -521,6 +780,24 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN, o
       return 0;
     });
   }, [rows, sortKey, sortDir]);
+
+  // When the user is editing, hold the row order steady. New rows that
+  // weren't in the original snapshot append at the end so they don't get
+  // hidden.
+  const displayed = useMemo(() => {
+    if (!frozenOrder) return sorted;
+    const byIdMap = new Map(sorted.map((r) => [r.id, r]));
+    const out = [];
+    const seen = new Set();
+    for (const id of frozenOrder) {
+      const r = byIdMap.get(id);
+      if (r) { out.push(r); seen.add(id); }
+    }
+    for (const r of sorted) {
+      if (!seen.has(r.id)) out.push(r);
+    }
+    return out;
+  }, [sorted, frozenOrder]);
 
   const toggleSort = (key) => {
     if (sortKey === key) {
@@ -561,14 +838,14 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN, o
           </tr>
         </thead>
         <tbody>
-          {sorted.length === 0 && (
+          {displayed.length === 0 && (
             <tr>
               <td colSpan={8} style={{ padding: '1.5em', color: 'var(--muted)', textAlign: 'center' }}>
                 {emptyMessage}
               </td>
             </tr>
           )}
-          {sorted.map((row) => {
+          {displayed.map((row) => {
             const { id, name, live, metrics, status, n, buyPrice, buyOverride } = row;
             const profit = metrics?.profitPerSession ?? 0;
             const buyLimit = live?.limit ?? null;
@@ -591,6 +868,8 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN, o
                     value={buyOverride != null ? buyOverride : ''}
                     placeholder={livePrice != null ? livePrice.toLocaleString() : '—'}
                     onChange={(e) => onUpdateBuyOverride(id, e.target.value)}
+                    onFocus={handleInputFocus(sorted)}
+                    onBlur={handleInputBlur}
                     inputMode="numeric"
                     title={
                       buyOverride != null
@@ -616,6 +895,8 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN, o
                     type="text"
                     value={n ?? ''}
                     onChange={(e) => onUpdateN(id, e.target.value)}
+                    onFocus={handleInputFocus(sorted)}
+                    onBlur={handleInputBlur}
                     inputMode="numeric"
                     title="How many you sell per Rogues' Den session for this item. Drives the profit math."
                     style={{

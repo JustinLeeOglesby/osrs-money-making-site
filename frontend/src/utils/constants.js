@@ -12,11 +12,10 @@ export const ROGUES_LIST_TAB = '🎒 Rogues’ list';
 export const ROGUES_LAB_TAB = '🧪 Rogues’ lab';
 export const ALERTS_TAB = '🔔 Profit alerts';
 
-// Rogues' Den "running list" — a curated, stable pool of priority items
-// the user keeps cycling. Sized to their playstyle (hours/day × sells/hour ÷
-// 4 × buy_limit), not a fixed cap. We keep this constant as a soft target
-// only (used for legacy compat); the UI no longer caps adds.
-export const ROGUES_LIST_MAX = 100;
+// Rogues' Den main running list cap — back to 27 (OSRS inventory minus
+// the coins slot). Items beyond the cap live in a separate "backup" pool,
+// rotated in/out as the active set evolves.
+export const ROGUES_LIST_MAX = 27;
 // Buy-limit threshold separating "priority" items (low limit, high margin)
 // from "fallback" items (high volume, always-on, lower margin). Users can
 // override in the lab settings.
