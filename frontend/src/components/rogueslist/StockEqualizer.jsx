@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fmtGp } from '../../utils/format';
-import { ROGUES_STOCKS_STORAGE_KEY } from '../../utils/constants';
+import { ROGUES_STOCKS_STORAGE_KEY, ROGUES_EQUALIZER_TARGET_KEY } from '../../utils/constants';
 import { fetchOcrStatus, ocrInventory } from '../../api/client';
 
 // Stock Equalizer — small calculator for the user's curated Rogues' Den
@@ -62,8 +62,24 @@ export default function StockEqualizer({
       /* session-only fallback */
     }
   }, [localStocks, setStocksProp]);
-  // Override the auto-computed target. null = "use the auto max."
-  const [targetOverride, setTargetOverride] = useState('');
+  // Override the auto-computed target. Persisted to localStorage (and synced
+  // across devices) so the "buying list" view doesn't reset to auto every
+  // time the user navigates away.
+  const [targetOverride, setTargetOverride] = useState(() => {
+    try {
+      return localStorage.getItem(ROGUES_EQUALIZER_TARGET_KEY) || '';
+    } catch {
+      return '';
+    }
+  });
+  useEffect(() => {
+    try {
+      if (targetOverride === '') localStorage.removeItem(ROGUES_EQUALIZER_TARGET_KEY);
+      else localStorage.setItem(ROGUES_EQUALIZER_TARGET_KEY, targetOverride);
+    } catch {
+      /* ignore */
+    }
+  }, [targetOverride]);
   // Sort + filter state for the equalizer table. Default: items most in need
   // first (highest "need to buy" descending) so users see action items at top.
   const [sortKey, setSortKey] = useState('need');

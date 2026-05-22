@@ -9,7 +9,7 @@ import {
 } from '../../utils/constants';
 import { computeRoguesMetrics } from '../../utils/rogues';
 import StockEqualizer from './StockEqualizer';
-import { ROGUES_STOCKS_STORAGE_KEY } from '../../utils/constants';
+import { ROGUES_STOCKS_STORAGE_KEY, ROGUES_EQUALIZER_OPEN_KEY } from '../../utils/constants';
 
 // Per-item stock + N storage shared with the StockEqualizer. Lifting this
 // state into the tab lets both the running list (which uses N for profit
@@ -159,8 +159,23 @@ export default function RoguesListTab() {
   const [query, setQuery] = useState('');
   const [showFallbacks, setShowFallbacks] = useState(false);
   // Stock equalizer is heavy (table of editable inputs); keep it folded
-  // away until the user explicitly opens it.
-  const [showEqualizer, setShowEqualizer] = useState(false);
+  // away until the user explicitly opens it — but remember their choice
+  // across navigations so the "buying list" doesn't reset to closed each
+  // time. Per-device (not in SYNCED_KEYS); it's a UI preference.
+  const [showEqualizer, setShowEqualizer] = useState(() => {
+    try {
+      return localStorage.getItem(ROGUES_EQUALIZER_OPEN_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(ROGUES_EQUALIZER_OPEN_KEY, showEqualizer ? '1' : '0');
+    } catch {
+      /* ignore */
+    }
+  }, [showEqualizer]);
 
   // We read settings on every render so changes from the lab propagate
   // (no cross-tab listener needed; the user has to refresh anyway).

@@ -27,6 +27,11 @@ export const ROGUES_LAB_SETTINGS_KEY = 'osrs-margin-rogues-lab-settings';
 // Per-item stock + sells/session tracking, used by the Stock Equalizer
 // section of the Running List tab. Shape: { [item_id]: { qty, n } }
 export const ROGUES_STOCKS_STORAGE_KEY = 'osrs-margin-rogues-stocks';
+// Persisted equalizer-panel state: target-sessions override + whether the
+// collapsible panel is open. Saving these so the "buying list" view sticks
+// around between visits instead of resetting to "panel closed, target=auto".
+export const ROGUES_EQUALIZER_TARGET_KEY = 'osrs-margin-rogues-equalizer-target';
+export const ROGUES_EQUALIZER_OPEN_KEY = 'osrs-margin-rogues-equalizer-open';
 // Items with hourly volume below this are flagged as "thin liquidity" so the
 // user can spot rec'd picks that look juicy on paper but won't fill.
 // (This is the default — the lab UI lets the user override it.)
