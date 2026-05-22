@@ -198,6 +198,14 @@ export default function RoguesListTab() {
     mainCount,
     backupCount,
     isFull,
+    lists,
+    activeListId,
+    activeList,
+    switchList,
+    createList,
+    renameList,
+    duplicateList,
+    deleteList,
   } = useRoguesList();
   const { open: openItemModal } = useItemModal();
 
@@ -455,6 +463,66 @@ export default function RoguesListTab() {
   return (
     <div className="alch-tab">
       <div className="alch-header">
+        {/* === List switcher === */}
+        <div className="list-switcher">
+          <span style={{ color: 'var(--muted)', fontSize: '0.85em' }}>Active list:</span>
+          <select
+            value={activeListId || ''}
+            onChange={(e) => switchList(e.target.value)}
+            className="range-btn"
+            style={{ cursor: 'pointer' }}
+          >
+            {lists.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name} ({l.items.length})
+              </option>
+            ))}
+          </select>
+          <button
+            className="range-btn"
+            onClick={() => {
+              const name = prompt('Name for new list:');
+              if (name && name.trim()) createList(name.trim());
+            }}
+            title="Create a new empty list"
+          >
+            + New
+          </button>
+          <button
+            className="range-btn"
+            onClick={() => {
+              const name = prompt('Rename list to:', activeList?.name || '');
+              if (name && name.trim()) renameList(activeListId, name.trim());
+            }}
+            title="Rename the active list"
+          >
+            ✎ Rename
+          </button>
+          <button
+            className="range-btn"
+            onClick={() => duplicateList(activeListId)}
+            title="Make a copy of this list (with items) and switch to it"
+          >
+            Duplicate
+          </button>
+          <button
+            className="range-btn"
+            onClick={() => {
+              if (lists.length <= 1) {
+                alert('Cannot delete the last list. Create another one first.');
+                return;
+              }
+              if (confirm(`Delete list "${activeList?.name}"? This removes its items only; stock counts are global and stay intact.`)) {
+                deleteList(activeListId);
+              }
+            }}
+            disabled={lists.length <= 1}
+            title={lists.length <= 1 ? 'Cannot delete the last remaining list' : 'Delete the active list'}
+          >
+            ✕ Delete
+          </button>
+        </div>
+
         {/* === Coverage header === */}
         <div className="alch-summary">
           <strong>
