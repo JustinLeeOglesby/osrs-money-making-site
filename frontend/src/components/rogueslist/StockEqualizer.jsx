@@ -42,6 +42,11 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
   const [stocks, setStocks] = useState(loadStocks);
   // Override the auto-computed target. null = "use the auto max."
   const [targetOverride, setTargetOverride] = useState('');
+  // Sort + filter state for the equalizer table. Default: items most in need
+  // first (highest "need to buy" descending) so users see action items at top.
+  const [sortKey, setSortKey] = useState('need');
+  const [sortDir, setSortDir] = useState('desc');
+  const [hideSatisfied, setHideSatisfied] = useState(false);
   // OCR feature toggles + state. Hidden entirely if backend says OCR isn't
   // configured (no ANTHROPIC_API_KEY). Otherwise: a small panel above the
   // equalizer table with file picker, preview, extracted-items review, and
@@ -106,6 +111,54 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
       return { ...r, need, cost };
     });
   }, [rows, target]);
+
+  // Apply sort + filter to produce the table's display rows. The sort is
+  // stable: ties (e.g. multiple items with need=0) fall back to alphabetical
+  // by name so the order doesn't shuffle on every click.
+  const sortGetter = (key) => (r) => {
+    switch (key) {
+      case 'name':        return (r.name || '').toLowerCase();
+      case 'buyPrice':    return r.buyPrice ?? -1;
+      case 'n':           return r.n ?? 0;
+      case 'qty':         return r.qty ?? 0;
+      case 'sessionsLeft':return r.sessionsLeft ?? 0;
+      case 'need':        return r.need ?? 0;
+      case 'cost':        return r.cost ?? 0;
+      default:            return 0;
+    }
+  };
+
+  const displayed = useMemo(() => {
+    let list = enriched;
+    if (hideSatisfied) list = list.filter((r) => r.need > 0);
+    const get = sortGetter(sortKey);
+    const getName = sortGetter('name');
+    return [...list].sort((a, b) => {
+      const va = get(a);
+      const vb = get(b);
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      // Tie-break alphabetically by name for stable ordering.
+      const na = getName(a);
+      const nb = getName(b);
+      if (na < nb) return -1;
+      if (na > nb) return 1;
+      return 0;
+    });
+  }, [enriched, sortKey, sortDir, hideSatisfied]);
+
+  // Header click → toggle direction if same column, else switch to it
+  // with a sensible default (name → asc, everything else → desc).
+  const toggleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir(key === 'name' ? 'asc' : 'desc');
+    }
+  };
+  const sortArrow = (key) =>
+    sortKey === key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '';
 
   // Roll-up totals
   const totals = useMemo(() => {
@@ -291,6 +344,13 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
               Auto
             </button>
           )}
+          <button
+            className={`range-btn ${hideSatisfied ? 'active' : ''}`}
+            onClick={() => setHideSatisfied((v) => !v)}
+            title="Show only items that still need buying (need > 0)"
+          >
+            {hideSatisfied ? 'Show all' : 'Hide ✓ at target'}
+          </button>
           <button className="range-btn" onClick={resetAllStocks} title="Reset all stock quantities to 0">
             Reset stocks
           </button>
@@ -438,17 +498,40 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
           <table className="alch-table bounded-table">
             <thead>
               <tr>
-                <th className="left">Item</th>
-                <th className="right">Buy price</th>
-                <th className="right">Sells / session</th>
-                <th className="right">Current stock</th>
-                <th className="right">Sessions left</th>
-                <th className="right">Buy to equalize</th>
-                <th className="right">Cost</th>
+                <th className={`left ${sortKey === 'name' ? 'sorted' : ''}`} onClick={() => toggleSort('name')}>
+                  Item{sortArrow('name')}
+                </th>
+                <th className={`right ${sortKey === 'buyPrice' ? 'sorted' : ''}`} onClick={() => toggleSort('buyPrice')}>
+                  Buy price{sortArrow('buyPrice')}
+                </th>
+                <th className={`right ${sortKey === 'n' ? 'sorted' : ''}`} onClick={() => toggleSort('n')}>
+                  Sells / session{sortArrow('n')}
+                </th>
+                <th className={`right ${sortKey === 'qty' ? 'sorted' : ''}`} onClick={() => toggleSort('qty')}>
+                  Current stock{sortArrow('qty')}
+                </th>
+                <th className={`right ${sortKey === 'sessionsLeft' ? 'sorted' : ''}`} onClick={() => toggleSort('sessionsLeft')}>
+                  Sessions left{sortArrow('sessionsLeft')}
+                </th>
+                <th className={`right ${sortKey === 'need' ? 'sorted' : ''}`} onClick={() => toggleSort('need')}>
+                  Buy to equalize{sortArrow('need')}
+                </th>
+                <th className={`right ${sortKey === 'cost' ? 'sorted' : ''}`} onClick={() => toggleSort('cost')}>
+                  Cost{sortArrow('cost')}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {enriched.map((r) => {
+              {displayed.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ padding: '1em', color: 'var(--muted)', textAlign: 'center' }}>
+                    {hideSatisfied
+                      ? 'All items are at target — nothing to buy. Toggle "Hide already at target" off to see them.'
+                      : 'No items.'}
+                  </td>
+                </tr>
+              )}
+              {displayed.map((r) => {
                 const isBehind = r.need > 0;
                 const isTarget = Math.abs(r.sessionsLeft - target) < 0.05;
                 return (
