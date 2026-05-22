@@ -175,8 +175,8 @@ def _build_payload() -> dict:
         out_hourly_volume = 0
         if primary_out_id is not None:
             hr = hourly.get(str(primary_out_id), {}) or {}
-            out_hourly_volume = (
-                (hr.get("highPriceVolume") or 0) + (hr.get("lowPriceVolume") or 0)
+            out_hourly_volume = (hr.get("highPriceVolume") or 0) + (
+                hr.get("lowPriceVolume") or 0
             )
         recipes_out.append(
             {
@@ -254,11 +254,7 @@ def _build_payload() -> dict:
 
 def _get_payload(force: bool = False) -> dict:
     now = time.time()
-    if (
-        force
-        or _cache["payload"] is None
-        or (now - _cache["ts"]) > CACHE_TTL_SECONDS
-    ):
+    if force or _cache["payload"] is None or (now - _cache["ts"]) > CACHE_TTL_SECONDS:
         _cache["payload"] = _build_payload()
         _cache["ts"] = now
     return _cache["payload"]
@@ -320,7 +316,9 @@ def item_detail(item_id: int):
     move = None
     if latest.get("high") is not None and hourly_avg_high and hourly_avg_high > 0:
         move = round((latest["high"] - hourly_avg_high) / hourly_avg_high * 100, 2)
-    hourly_volume = (hourly.get("highPriceVolume") or 0) + (hourly.get("lowPriceVolume") or 0)
+    hourly_volume = (hourly.get("highPriceVolume") or 0) + (
+        hourly.get("lowPriceVolume") or 0
+    )
     return jsonify(
         {
             "id": item_id,
@@ -356,13 +354,15 @@ def calculate_ge_tax_safe(price):
 ROGUES_START_PCT = 1.00
 ROGUES_STEP_PCT = 0.02
 ROGUES_FLOOR_PCT = 0.60
-ROGUES_FLOOR_SALE_INDEX = int((ROGUES_START_PCT - ROGUES_FLOOR_PCT) / ROGUES_STEP_PCT) + 1  # 21
+ROGUES_FLOOR_SALE_INDEX = (
+    int((ROGUES_START_PCT - ROGUES_FLOOR_PCT) / ROGUES_STEP_PCT) + 1
+)  # 21
 
 # Real-world timings for the optimization. Each click sells one batch from
 # the available sizes — you can't sell arbitrary counts, only multiples of
 # 5 by combining "sell 5", "sell 10", and "sell 50" actions.
-ROGUES_HOP_SECONDS = 10        # world hop + walk back to Martin
-ROGUES_CLICK_SECONDS = 2       # per "sell X" click (regardless of batch size)
+ROGUES_HOP_SECONDS = 10  # world hop + walk back to Martin
+ROGUES_CLICK_SECONDS = 2  # per "sell X" click (regardless of batch size)
 ROGUES_BATCH_SIZES = (50, 10, 5)
 
 
@@ -575,7 +575,9 @@ def flipping():
         if hourly_avg_high and hourly_avg_high > 0:
             recent_move_pct = round((high - hourly_avg_high) / hourly_avg_high * 100, 2)
         fm = fivemin.get(item_id_str, {}) or {}
-        recent_5m_volume = (fm.get("highPriceVolume") or 0) + (fm.get("lowPriceVolume") or 0)
+        recent_5m_volume = (fm.get("highPriceVolume") or 0) + (
+            fm.get("lowPriceVolume") or 0
+        )
         results.append(
             {
                 "id": item_id,
@@ -655,7 +657,9 @@ def high_alch():
         # negative = price diving. Free (uses /1h which is already cached).
         hourly_avg_high = hr.get("avgHighPrice")
         if hourly_avg_high and hourly_avg_high > 0:
-            recent_move_pct = round((buy_price - hourly_avg_high) / hourly_avg_high * 100, 2)
+            recent_move_pct = round(
+                (buy_price - hourly_avg_high) / hourly_avg_high * 100, 2
+            )
         else:
             recent_move_pct = None
 
@@ -668,7 +672,9 @@ def high_alch():
         daily_entry = daily.get(item_id_str, {}) or {}
         daily_avg_high = daily_entry.get("avgHighPrice")
         if daily_avg_high and daily_avg_high > 0:
-            price_vs_24h_pct = round((buy_price - daily_avg_high) / daily_avg_high * 100, 2)
+            price_vs_24h_pct = round(
+                (buy_price - daily_avg_high) / daily_avg_high * 100, 2
+            )
             sustainable = _rogues_metrics(highalch, int(daily_avg_high), limit)
             sustainable_profit = sustainable["profitPerSession"]
             sustainable_gp_per_hr = sustainable["optimalGpPerHr"]
@@ -687,16 +693,21 @@ def high_alch():
         # We cap the displayed gp/hr by the rate at which the market actually
         # turns over the item. We use the 24h volume (averaged to per-hour) for
         # stability — the /1h figure is too spiky to make ranking decisions on.
-        daily_total_vol_24h = (
-            (daily_entry.get("highPriceVolume") or 0)
-            + (daily_entry.get("lowPriceVolume") or 0)
+        daily_total_vol_24h = (daily_entry.get("highPriceVolume") or 0) + (
+            daily_entry.get("lowPriceVolume") or 0
         )
         daily_vol_per_hr = daily_total_vol_24h / 24.0 if daily_total_vol_24h else 0
         sells_per_session = rogues["sellsPerSession"]
-        if sells_per_session > 0 and daily_vol_per_hr > 0 and rogues["profitPerSession"] > 0:
+        if (
+            sells_per_session > 0
+            and daily_vol_per_hr > 0
+            and rogues["profitPerSession"] > 0
+        ):
             # How many sessions per hour the market actually supports
             volume_bound_sessions_per_hr = daily_vol_per_hr / sells_per_session
-            volume_bound_gp_per_hr = volume_bound_sessions_per_hr * rogues["profitPerSession"]
+            volume_bound_gp_per_hr = (
+                volume_bound_sessions_per_hr * rogues["profitPerSession"]
+            )
             realistic_gp_per_hr = min(rogues["optimalGpPerHr"], volume_bound_gp_per_hr)
             # True = the volume cap is the bottleneck, not click speed; useful UI hint
             volume_bottlenecked = volume_bound_gp_per_hr < rogues["optimalGpPerHr"]
@@ -733,7 +744,9 @@ def high_alch():
         # Phase B uses `avg24hLow` — the insta-sell price averaged over 24h,
         # which is approximately what a patient GE buy offer will fill at.
         daily_avg_low = daily_entry.get("avgLowPrice")
-        phase_b_buy_price = int(daily_avg_low) if daily_avg_low and daily_avg_low > 0 else None
+        phase_b_buy_price = (
+            int(daily_avg_low) if daily_avg_low and daily_avg_low > 0 else None
+        )
         if phase_b_buy_price and phase_b_buy_price > 0:
             phase_b = _rogues_metrics(highalch, phase_b_buy_price, limit)
             phase_b_alch_profit = highalch - phase_b_buy_price - nature_price
@@ -779,11 +792,7 @@ def high_alch():
         # buy price, optimal N). This is *independent* of how many hours the
         # user is active — they hit the limit fast and then have to wait.
         phase_c_buy_price = phase_a_buy_price
-        if (
-            limit
-            and phase_a["sellsPerSession"] > 0
-            and phase_a["profitPerSession"] > 0
-        ):
+        if limit and phase_a["sellsPerSession"] > 0 and phase_a["profitPerSession"] > 0:
             phase_a_avg_profit_per_item = (
                 phase_a["profitPerSession"] / phase_a["sellsPerSession"]
             )
@@ -857,9 +866,7 @@ def high_alch():
             if phase_b_daily >= active_daily * 1.30:
                 suggested_phase = "B"
                 gain_pct = round((phase_b_daily / active_daily - 1) * 100)
-                suggested_phase_reason = (
-                    f"Patient offer captures +{gain_pct}% more daily profit vs active cycling"
-                )
+                suggested_phase_reason = f"Patient offer captures +{gain_pct}% more daily profit vs active cycling"
             elif spread_pct is not None and spread_pct < 3:
                 suggested_phase = active_phase
                 suggested_phase_reason = (
@@ -874,7 +881,9 @@ def high_alch():
             suggested_phase_reason = active_reason
         elif phase_b_daily > 0:
             suggested_phase = "B"
-            suggested_phase_reason = "Only profitable via patient GE offer at typical low"
+            suggested_phase_reason = (
+                "Only profitable via patient GE offer at typical low"
+            )
 
         # Buy-limit headroom: how many sessions of N items can you cycle before
         # hitting the 4-hour GE buy limit? If > "sessions per active period"
@@ -912,7 +921,9 @@ def high_alch():
                 "sustainableRoguesGpPerHr": sustainable_gp_per_hr,
                 "sustainableAlchProfit": sustainable_alch_profit,
                 "realisticRoguesGpPerHr": int(round(realistic_gp_per_hr)),
-                "sustainableRealisticGpPerHr": int(round(sustainable_realistic_gp_per_hr)),
+                "sustainableRealisticGpPerHr": int(
+                    round(sustainable_realistic_gp_per_hr)
+                ),
                 "dailyVolumePerHr": int(round(daily_vol_per_hr)),
                 "volumeBottlenecked": volume_bottlenecked,
                 # --- Two-phase trading model (insta-buy vs patient GE offer) ---
@@ -922,11 +933,17 @@ def high_alch():
                 "phaseAGpPerHr": phase_a["optimalGpPerHr"],
                 "phaseARealisticGpPerHr": int(round(phase_a_realistic_gp_per_hr)),
                 "phaseBBuyPrice": phase_b_buy_price,
-                "phaseBProfitPerSession": phase_b["profitPerSession"] if phase_b else None,
-                "phaseBSellsPerSession": phase_b["sellsPerSession"] if phase_b else None,
+                "phaseBProfitPerSession": phase_b["profitPerSession"]
+                if phase_b
+                else None,
+                "phaseBSellsPerSession": phase_b["sellsPerSession"]
+                if phase_b
+                else None,
                 "phaseBGpPerHr": phase_b["optimalGpPerHr"] if phase_b else None,
                 "phaseBRealisticGpPerHr": int(round(phase_b_realistic_gp_per_hr)),
-                "phaseBLastSaleMargin": phase_b.get("lastSaleMargin") if phase_b else None,
+                "phaseBLastSaleMargin": phase_b.get("lastSaleMargin")
+                if phase_b
+                else None,
                 "phaseBAlchProfit": phase_b_alch_profit,
                 "spreadPct": spread_pct,
                 "suggestedPhase": suggested_phase,
@@ -946,13 +963,14 @@ def high_alch():
                 # in the past 5-min window; is5mActive is the convenience bool.
                 "recent5mVolume": (
                     (fivemin.get(item_id_str, {}) or {}).get("highPriceVolume") or 0
-                ) + (
-                    (fivemin.get(item_id_str, {}) or {}).get("lowPriceVolume") or 0
-                ),
+                )
+                + ((fivemin.get(item_id_str, {}) or {}).get("lowPriceVolume") or 0),
             }
         )
     results.sort(key=lambda r: r["profitPerAlch"], reverse=True)
-    return jsonify({"items": results, "natureRunePrice": nature_price, "count": len(results)})
+    return jsonify(
+        {"items": results, "natureRunePrice": nature_price, "count": len(results)}
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -963,208 +981,604 @@ def high_alch():
 # ---------------------------------------------------------------------------
 _SHOP_DATA = [
     # Baba Yaga's Magic Shop — Lunar Isle (Lunar Diplomacy quest)
-    {"shop": "Baba Yaga's Magic Shop", "location": "Lunar Isle", "req": "Lunar Diplomacy",
-     "items": [
-         {"item_id": 9075, "item_name": "Astral rune",  "shop_price": 27,   "stock": 250},
-         {"item_id": 560,  "item_name": "Death rune",   "shop_price": 99,   "stock": 250},
-         {"item_id": 565,  "item_name": "Blood rune",   "shop_price": 220,  "stock": 250},
-         {"item_id": 566,  "item_name": "Soul rune",    "shop_price": 165,  "stock": 250},
-         {"item_id": 562,  "item_name": "Chaos rune",   "shop_price": 49,   "stock": 250},
-         {"item_id": 1391, "item_name": "Battlestaff",  "shop_price": 3850, "stock": 5},
-     ]},
+    {
+        "shop": "Baba Yaga's Magic Shop",
+        "location": "Lunar Isle",
+        "req": "Lunar Diplomacy",
+        "items": [
+            {
+                "item_id": 9075,
+                "item_name": "Astral rune",
+                "shop_price": 27,
+                "stock": 250,
+            },
+            {"item_id": 560, "item_name": "Death rune", "shop_price": 99, "stock": 250},
+            {
+                "item_id": 565,
+                "item_name": "Blood rune",
+                "shop_price": 220,
+                "stock": 250,
+            },
+            {"item_id": 566, "item_name": "Soul rune", "shop_price": 165, "stock": 250},
+            {"item_id": 562, "item_name": "Chaos rune", "shop_price": 49, "stock": 250},
+            {
+                "item_id": 1391,
+                "item_name": "Battlestaff",
+                "shop_price": 3850,
+                "stock": 5,
+            },
+        ],
+    },
     # Amlodd's Magical Supplies — Prifddinas (Song of the Elves)
-    {"shop": "Amlodd's Magical Supplies", "location": "Prifddinas", "req": "Song of the Elves",
-     "items": [
-         {"item_id": 564,  "item_name": "Cosmic rune",  "shop_price": 50,   "stock": 250},
-     ]},
+    {
+        "shop": "Amlodd's Magical Supplies",
+        "location": "Prifddinas",
+        "req": "Song of the Elves",
+        "items": [
+            {
+                "item_id": 564,
+                "item_name": "Cosmic rune",
+                "shop_price": 50,
+                "stock": 250,
+            },
+        ],
+    },
     # Elgan's Exceptional Staffs! — Prifddinas (Song of the Elves)
-    {"shop": "Elgan's Exceptional Staffs!", "location": "Prifddinas", "req": "Song of the Elves",
-     "items": [
-         {"item_id": 1381, "item_name": "Staff of air", "shop_price": 1500, "stock": 2},
-     ]},
+    {
+        "shop": "Elgan's Exceptional Staffs!",
+        "location": "Prifddinas",
+        "req": "Song of the Elves",
+        "items": [
+            {
+                "item_id": 1381,
+                "item_name": "Staff of air",
+                "shop_price": 1500,
+                "stock": 2,
+            },
+        ],
+    },
     # Ak-Haranu's Exotic Shop — Port Phasmatys (Ghosts Ahoy)
     # Price starts at 50gp and rises 2% per item as stock depletes from 500.
-    {"shop": "Ak-Haranu's Exotic Shop", "location": "Port Phasmatys", "req": "Ghosts Ahoy",
-     "items": [
-         {"item_id": 4740, "item_name": "Bolt rack",    "shop_price": 50,   "stock": 500,
-          "notes": "Base price 50gp; rises ~2gp/item sold — hop before it surpasses GE"},
-     ]},
+    {
+        "shop": "Ak-Haranu's Exotic Shop",
+        "location": "Port Phasmatys",
+        "req": "Ghosts Ahoy",
+        "items": [
+            {
+                "item_id": 4740,
+                "item_name": "Bolt rack",
+                "shop_price": 50,
+                "stock": 500,
+                "notes": "Base price 50gp; rises ~2gp/item sold — hop before it surpasses GE",
+            },
+        ],
+    },
     # Contraband Yak Produce — Jatizso (Fremennik Isles quest + pay Vanligga's tax)
-    {"shop": "Contraband Yak Produce", "location": "Jatizso", "req": "Fremennik Isles",
-     "items": [
-         {"item_id": 10818, "item_name": "Yak-hide",       "shop_price": 55,  "stock": 25},
-         {"item_id": 10816, "item_name": "Raw yak meat",   "shop_price": 2,   "stock": 50},
-         {"item_id": 10814, "item_name": "Hair",           "shop_price": 2,   "stock": 50},
-         {"item_id": 10820, "item_name": "Cured yak-hide", "shop_price": 110, "stock": 10},
-     ]},
+    {
+        "shop": "Contraband Yak Produce",
+        "location": "Jatizso",
+        "req": "Fremennik Isles",
+        "items": [
+            {"item_id": 10818, "item_name": "Yak-hide", "shop_price": 55, "stock": 25},
+            {
+                "item_id": 10816,
+                "item_name": "Raw yak meat",
+                "shop_price": 2,
+                "stock": 50,
+            },
+            {"item_id": 10814, "item_name": "Hair", "shop_price": 2, "stock": 50},
+            {
+                "item_id": 10820,
+                "item_name": "Cured yak-hide",
+                "shop_price": 110,
+                "stock": 10,
+            },
+        ],
+    },
     # Weapons Galore — Jatizso (Fremennik Isles)
-    {"shop": "Weapons Galore", "location": "Jatizso", "req": "Fremennik Isles",
-     "items": [
-         {"item_id": 3099, "item_name": "Mithril claws", "shop_price": 522, "stock": 4},
-     ]},
+    {
+        "shop": "Weapons Galore",
+        "location": "Jatizso",
+        "req": "Fremennik Isles",
+        "items": [
+            {
+                "item_id": 3099,
+                "item_name": "Mithril claws",
+                "shop_price": 522,
+                "stock": 4,
+            },
+        ],
+    },
     # Frankie's Fishing Emporium — Port Piscarilius (no quest required)
-    {"shop": "Frankie's Fishing Emporium", "location": "Port Piscarilius", "req": "None",
-     "items": [
-         {"item_id": 383, "item_name": "Raw shark",     "shop_price": 170, "stock": 25},
-         {"item_id": 371, "item_name": "Raw swordfish", "shop_price": 80,  "stock": 50},
-         {"item_id": 377, "item_name": "Raw lobster",   "shop_price": 70,  "stock": 50},
-         {"item_id": 359, "item_name": "Raw tuna",      "shop_price": 40,  "stock": 100},
-         {"item_id": 353, "item_name": "Raw mackerel",  "shop_price": 15,  "stock": 250},
-     ]},
+    {
+        "shop": "Frankie's Fishing Emporium",
+        "location": "Port Piscarilius",
+        "req": "None",
+        "items": [
+            {"item_id": 383, "item_name": "Raw shark", "shop_price": 170, "stock": 25},
+            {
+                "item_id": 371,
+                "item_name": "Raw swordfish",
+                "shop_price": 80,
+                "stock": 50,
+            },
+            {"item_id": 377, "item_name": "Raw lobster", "shop_price": 70, "stock": 50},
+            {"item_id": 359, "item_name": "Raw tuna", "shop_price": 40, "stock": 100},
+            {
+                "item_id": 353,
+                "item_name": "Raw mackerel",
+                "shop_price": 15,
+                "stock": 250,
+            },
+        ],
+    },
     # Obli's General Store — Shilo Village (Shilo Village quest)
-    {"shop": "Obli's General Store", "location": "Shilo Village", "req": "Shilo Village quest",
-     "items": [
-         {"item_id": 973, "item_name": "Charcoal", "shop_price": 67, "stock": 50},
-         {"item_id": 970, "item_name": "Papyrus",  "shop_price": 15, "stock": 50},
-         {"item_id": 975, "item_name": "Machete",  "shop_price": 60, "stock": 50},
-     ]},
+    {
+        "shop": "Obli's General Store",
+        "location": "Shilo Village",
+        "req": "Shilo Village quest",
+        "items": [
+            {"item_id": 973, "item_name": "Charcoal", "shop_price": 67, "stock": 50},
+            {"item_id": 970, "item_name": "Papyrus", "shop_price": 15, "stock": 50},
+            {"item_id": 975, "item_name": "Machete", "shop_price": 60, "stock": 50},
+        ],
+    },
     # Jiminua's Jungle Store — Tai Bwo Wannai, Karamja (no quest required)
-    {"shop": "Jiminua's Jungle Store", "location": "Tai Bwo Wannai", "req": "None",
-     "items": [
-         {"item_id": 973, "item_name": "Charcoal",      "shop_price": 58,  "stock": 50},
-         {"item_id": 970, "item_name": "Papyrus",       "shop_price": 13,  "stock": 50},
-         {"item_id": 175, "item_name": "Antipoison(3)", "shop_price": 374, "stock": 10},
-     ]},
+    {
+        "shop": "Jiminua's Jungle Store",
+        "location": "Tai Bwo Wannai",
+        "req": "None",
+        "items": [
+            {"item_id": 973, "item_name": "Charcoal", "shop_price": 58, "stock": 50},
+            {"item_id": 970, "item_name": "Papyrus", "shop_price": 13, "stock": 50},
+            {
+                "item_id": 175,
+                "item_name": "Antipoison(3)",
+                "shop_price": 374,
+                "stock": 10,
+            },
+        ],
+    },
     # Lletya Seamstress — Lletya, Tirannwn (partial Elf quest access)
-    {"shop": "Lletya Seamstress", "location": "Lletya", "req": "Mourning's End Part I access",
-     "items": [
-         {"item_id": 1763, "item_name": "Red dye",    "shop_price": 6, "stock": 10},
-         {"item_id": 1765, "item_name": "Yellow dye", "shop_price": 6, "stock": 10},
-         {"item_id": 1767, "item_name": "Blue dye",   "shop_price": 6, "stock": 10},
-         {"item_id": 1769, "item_name": "Orange dye", "shop_price": 6, "stock": 10},
-         {"item_id": 1771, "item_name": "Green dye",  "shop_price": 6, "stock": 10},
-         {"item_id": 1773, "item_name": "Purple dye", "shop_price": 6, "stock": 10},
-     ]},
+    {
+        "shop": "Lletya Seamstress",
+        "location": "Lletya",
+        "req": "Mourning's End Part I access",
+        "items": [
+            {"item_id": 1763, "item_name": "Red dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1765, "item_name": "Yellow dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1767, "item_name": "Blue dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1769, "item_name": "Orange dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1771, "item_name": "Green dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1773, "item_name": "Purple dye", "shop_price": 6, "stock": 10},
+        ],
+    },
     # Guinevere's Dyes — Prifddinas, Ithell district (Song of the Elves)
     # Same items as Lletya Seamstress — second world-hoppable source
-    {"shop": "Guinevere's Dyes", "location": "Prifddinas", "req": "Song of the Elves",
-     "items": [
-         {"item_id": 1763, "item_name": "Red dye",    "shop_price": 6, "stock": 10},
-         {"item_id": 1765, "item_name": "Yellow dye", "shop_price": 6, "stock": 10},
-         {"item_id": 1767, "item_name": "Blue dye",   "shop_price": 6, "stock": 10},
-         {"item_id": 1769, "item_name": "Orange dye", "shop_price": 6, "stock": 10},
-         {"item_id": 1771, "item_name": "Green dye",  "shop_price": 6, "stock": 10},
-         {"item_id": 1773, "item_name": "Purple dye", "shop_price": 6, "stock": 10},
-     ]},
+    {
+        "shop": "Guinevere's Dyes",
+        "location": "Prifddinas",
+        "req": "Song of the Elves",
+        "items": [
+            {"item_id": 1763, "item_name": "Red dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1765, "item_name": "Yellow dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1767, "item_name": "Blue dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1769, "item_name": "Orange dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1771, "item_name": "Green dye", "shop_price": 6, "stock": 10},
+            {"item_id": 1773, "item_name": "Purple dye", "shop_price": 6, "stock": 10},
+        ],
+    },
     # Stonemason — Keldagrim (started The Giant Dwarf)
     # Also: Stonecutter Outpost in Varlamore sells the same items at the same prices.
-    {"shop": "Stonemason", "location": "Keldagrim", "req": "Started The Giant Dwarf",
-     "items": [
-         {"item_id": 3420,  "item_name": "Limestone brick", "shop_price": 26,        "stock": 1000},
-         {"item_id": 8784,  "item_name": "Gold leaf",       "shop_price": 130_000,   "stock": 20},
-         {"item_id": 8786,  "item_name": "Marble block",    "shop_price": 325_000,   "stock": 20},
-         {"item_id": 8788,  "item_name": "Magic stone",     "shop_price": 975_000,   "stock": 10},
-         {"item_id": 26266, "item_name": "Condensed gold",  "shop_price": 10_400_000,"stock": 10},
-     ]},
+    {
+        "shop": "Stonemason",
+        "location": "Keldagrim",
+        "req": "Started The Giant Dwarf",
+        "items": [
+            {
+                "item_id": 3420,
+                "item_name": "Limestone brick",
+                "shop_price": 26,
+                "stock": 1000,
+            },
+            {
+                "item_id": 8784,
+                "item_name": "Gold leaf",
+                "shop_price": 130_000,
+                "stock": 20,
+            },
+            {
+                "item_id": 8786,
+                "item_name": "Marble block",
+                "shop_price": 325_000,
+                "stock": 20,
+            },
+            {
+                "item_id": 8788,
+                "item_name": "Magic stone",
+                "shop_price": 975_000,
+                "stock": 10,
+            },
+            {
+                "item_id": 26266,
+                "item_name": "Condensed gold",
+                "shop_price": 10_400_000,
+                "stock": 10,
+            },
+        ],
+    },
     # Garden Centre — Falador Park + Farming Guild (Farming Guild needs 45 Farming + Hosidius)
     # Two instances of the shop = 2× stock per hop cycle (40 of each item per world)
-    {"shop": "Garden Centre", "location": "Falador / Farming Guild", "req": "None (45 Farm for Guild)",
-     "items": [
-         {"item_id": 8417, "item_name": "Bagged dead tree",         "shop_price": 1000,   "stock": 40, "notes": "2 shops per world (Falador + Guild)"},
-         {"item_id": 8419, "item_name": "Bagged nice tree",         "shop_price": 2000,   "stock": 40},
-         {"item_id": 8421, "item_name": "Bagged oak tree",          "shop_price": 5000,   "stock": 40},
-         {"item_id": 8423, "item_name": "Bagged willow tree",       "shop_price": 10000,  "stock": 40},
-         {"item_id": 8425, "item_name": "Bagged maple tree",        "shop_price": 15000,  "stock": 40},
-         {"item_id": 8427, "item_name": "Bagged yew tree",          "shop_price": 20000,  "stock": 40},
-         {"item_id": 8429, "item_name": "Bagged magic tree",        "shop_price": 50000,  "stock": 40},
-         {"item_id": 8431, "item_name": "Bagged plant 1",           "shop_price": 1000,   "stock": 40},
-         {"item_id": 8433, "item_name": "Bagged plant 2",           "shop_price": 5000,   "stock": 40},
-         {"item_id": 8435, "item_name": "Bagged plant 3",           "shop_price": 10000,  "stock": 40},
-         {"item_id": 8437, "item_name": "Thorny hedge (bagged)",    "shop_price": 5000,   "stock": 40},
-         {"item_id": 8439, "item_name": "Nice hedge (bagged)",      "shop_price": 10000,  "stock": 40},
-         {"item_id": 8441, "item_name": "Small box hedge (bagged)", "shop_price": 15000,  "stock": 40},
-         {"item_id": 8443, "item_name": "Topiary hedge (bagged)",   "shop_price": 20000,  "stock": 40},
-         {"item_id": 8445, "item_name": "Fancy hedge (bagged)",     "shop_price": 25000,  "stock": 40},
-         {"item_id": 8447, "item_name": "Tall fancy hedge (bagged)","shop_price": 50000,  "stock": 40},
-         {"item_id": 8449, "item_name": "Tall box hedge (bagged)",  "shop_price": 100000, "stock": 40},
-         {"item_id": 8451, "item_name": "Bagged flower",            "shop_price": 5000,   "stock": 40},
-         {"item_id": 8453, "item_name": "Bagged daffodils",         "shop_price": 10000,  "stock": 40},
-         {"item_id": 8455, "item_name": "Bagged bluebells",         "shop_price": 15000,  "stock": 40},
-         {"item_id": 8457, "item_name": "Bagged sunflower",         "shop_price": 5000,   "stock": 40},
-         {"item_id": 8459, "item_name": "Bagged marigolds",         "shop_price": 10000,  "stock": 40},
-         {"item_id": 8461, "item_name": "Bagged roses",             "shop_price": 15000,  "stock": 40},
-     ]},
+    {
+        "shop": "Garden Centre",
+        "location": "Falador / Farming Guild",
+        "req": "None (45 Farm for Guild)",
+        "items": [
+            {
+                "item_id": 8417,
+                "item_name": "Bagged dead tree",
+                "shop_price": 1000,
+                "stock": 40,
+                "notes": "2 shops per world (Falador + Guild)",
+            },
+            {
+                "item_id": 8419,
+                "item_name": "Bagged nice tree",
+                "shop_price": 2000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8421,
+                "item_name": "Bagged oak tree",
+                "shop_price": 5000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8423,
+                "item_name": "Bagged willow tree",
+                "shop_price": 10000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8425,
+                "item_name": "Bagged maple tree",
+                "shop_price": 15000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8427,
+                "item_name": "Bagged yew tree",
+                "shop_price": 20000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8429,
+                "item_name": "Bagged magic tree",
+                "shop_price": 50000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8431,
+                "item_name": "Bagged plant 1",
+                "shop_price": 1000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8433,
+                "item_name": "Bagged plant 2",
+                "shop_price": 5000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8435,
+                "item_name": "Bagged plant 3",
+                "shop_price": 10000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8437,
+                "item_name": "Thorny hedge (bagged)",
+                "shop_price": 5000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8439,
+                "item_name": "Nice hedge (bagged)",
+                "shop_price": 10000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8441,
+                "item_name": "Small box hedge (bagged)",
+                "shop_price": 15000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8443,
+                "item_name": "Topiary hedge (bagged)",
+                "shop_price": 20000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8445,
+                "item_name": "Fancy hedge (bagged)",
+                "shop_price": 25000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8447,
+                "item_name": "Tall fancy hedge (bagged)",
+                "shop_price": 50000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8449,
+                "item_name": "Tall box hedge (bagged)",
+                "shop_price": 100000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8451,
+                "item_name": "Bagged flower",
+                "shop_price": 5000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8453,
+                "item_name": "Bagged daffodils",
+                "shop_price": 10000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8455,
+                "item_name": "Bagged bluebells",
+                "shop_price": 15000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8457,
+                "item_name": "Bagged sunflower",
+                "shop_price": 5000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8459,
+                "item_name": "Bagged marigolds",
+                "shop_price": 10000,
+                "stock": 40,
+            },
+            {
+                "item_id": 8461,
+                "item_name": "Bagged roses",
+                "shop_price": 15000,
+                "stock": 40,
+            },
+        ],
+    },
     # Dargaud's Bows and Arrows (Ranging Guild, 40 Ranged) +
     # Hickton's Archery Emporium (Catherby, no req) — same prices, two world-hop sources
-    {"shop": "Dargaud's / Hickton's", "location": "Ranging Guild + Catherby", "req": "40 Ranged (Dargaud's only)",
-     "items": [
-         {"item_id": 39, "item_name": "Bronze arrowtips", "shop_price": 1,   "stock": 1500},
-         {"item_id": 40, "item_name": "Iron arrowtips",   "shop_price": 2,   "stock": 1200},
-         {"item_id": 41, "item_name": "Steel arrowtips",  "shop_price": 6,   "stock": 900},
-         {"item_id": 42, "item_name": "Mithril arrowtips","shop_price": 16,  "stock": 600},
-         {"item_id": 43, "item_name": "Adamant arrowtips","shop_price": 40,  "stock": 400},
-         {"item_id": 44, "item_name": "Rune arrowtips",   "shop_price": 200, "stock": 250},
-     ]},
+    {
+        "shop": "Dargaud's / Hickton's",
+        "location": "Ranging Guild + Catherby",
+        "req": "40 Ranged (Dargaud's only)",
+        "items": [
+            {
+                "item_id": 39,
+                "item_name": "Bronze arrowtips",
+                "shop_price": 1,
+                "stock": 1500,
+            },
+            {
+                "item_id": 40,
+                "item_name": "Iron arrowtips",
+                "shop_price": 2,
+                "stock": 1200,
+            },
+            {
+                "item_id": 41,
+                "item_name": "Steel arrowtips",
+                "shop_price": 6,
+                "stock": 900,
+            },
+            {
+                "item_id": 42,
+                "item_name": "Mithril arrowtips",
+                "shop_price": 16,
+                "stock": 600,
+            },
+            {
+                "item_id": 43,
+                "item_name": "Adamant arrowtips",
+                "shop_price": 40,
+                "stock": 400,
+            },
+            {
+                "item_id": 44,
+                "item_name": "Rune arrowtips",
+                "shop_price": 200,
+                "stock": 250,
+            },
+        ],
+    },
     # Lliann's Wares — Prifddinas, Ithell district (Song of the Elves)
-    {"shop": "Lliann's Wares", "location": "Prifddinas", "req": "Song of the Elves",
-     "items": [
-         {"item_id": 24003, "item_name": "Elven boots",        "shop_price": 10000, "stock": 50},
-         {"item_id": 24006, "item_name": "Elven gloves",       "shop_price": 10000, "stock": 50},
-         {"item_id": 24009, "item_name": "Elven top (yellow)", "shop_price": 5000,  "stock": 100},
-         {"item_id": 24012, "item_name": "Elven skirt (yellow)","shop_price": 5000, "stock": 100},
-         {"item_id": 24015, "item_name": "Elven top (white)",  "shop_price": 5000,  "stock": 100},
-         {"item_id": 24018, "item_name": "Elven skirt (white)","shop_price": 5000,  "stock": 100},
-     ]},
+    {
+        "shop": "Lliann's Wares",
+        "location": "Prifddinas",
+        "req": "Song of the Elves",
+        "items": [
+            {
+                "item_id": 24003,
+                "item_name": "Elven boots",
+                "shop_price": 10000,
+                "stock": 50,
+            },
+            {
+                "item_id": 24006,
+                "item_name": "Elven gloves",
+                "shop_price": 10000,
+                "stock": 50,
+            },
+            {
+                "item_id": 24009,
+                "item_name": "Elven top (yellow)",
+                "shop_price": 5000,
+                "stock": 100,
+            },
+            {
+                "item_id": 24012,
+                "item_name": "Elven skirt (yellow)",
+                "shop_price": 5000,
+                "stock": 100,
+            },
+            {
+                "item_id": 24015,
+                "item_name": "Elven top (white)",
+                "shop_price": 5000,
+                "stock": 100,
+            },
+            {
+                "item_id": 24018,
+                "item_name": "Elven skirt (white)",
+                "shop_price": 5000,
+                "stock": 100,
+            },
+        ],
+    },
     # Artima's Crafting Supplies — Civitas illa Fortis, Varlamore (no requirement)
-    {"shop": "Artima's Crafting Supplies", "location": "Civitas illa Fortis", "req": "None",
-     "items": [
-         {"item_id": 1597,  "item_name": "Necklace mould",  "shop_price": 5,   "stock": 4},
-         {"item_id": 11065, "item_name": "Bracelet mould",  "shop_price": 5,   "stock": 4},
-         {"item_id": 1595,  "item_name": "Amulet mould",    "shop_price": 5,   "stock": 4},
-         {"item_id": 1592,  "item_name": "Ring mould",      "shop_price": 5,   "stock": 4},
-         {"item_id": 5523,  "item_name": "Tiara mould",     "shop_price": 100, "stock": 4},
-     ]},
+    {
+        "shop": "Artima's Crafting Supplies",
+        "location": "Civitas illa Fortis",
+        "req": "None",
+        "items": [
+            {
+                "item_id": 1597,
+                "item_name": "Necklace mould",
+                "shop_price": 5,
+                "stock": 4,
+            },
+            {
+                "item_id": 11065,
+                "item_name": "Bracelet mould",
+                "shop_price": 5,
+                "stock": 4,
+            },
+            {"item_id": 1595, "item_name": "Amulet mould", "shop_price": 5, "stock": 4},
+            {"item_id": 1592, "item_name": "Ring mould", "shop_price": 5, "stock": 4},
+            {
+                "item_id": 5523,
+                "item_name": "Tiara mould",
+                "shop_price": 100,
+                "stock": 4,
+            },
+        ],
+    },
     # Lidio's Fine Groceries — Warriors' Guild (130 combined Attack+Strength or 99 in either)
-    {"shop": "Lidio's Fine Groceries", "location": "Warriors' Guild", "req": "130 Attack+Strength",
-     "items": [
-         {"item_id": 2289, "item_name": "Plain pizza",        "shop_price": 48, "stock": 5},
-         {"item_id": 6705, "item_name": "Potato with cheese", "shop_price": 9,  "stock": 10},
-     ]},
+    {
+        "shop": "Lidio's Fine Groceries",
+        "location": "Warriors' Guild",
+        "req": "130 Attack+Strength",
+        "items": [
+            {"item_id": 2289, "item_name": "Plain pizza", "shop_price": 48, "stock": 5},
+            {
+                "item_id": 6705,
+                "item_name": "Potato with cheese",
+                "shop_price": 9,
+                "stock": 10,
+            },
+        ],
+    },
     # Aleck's Hunter Emporium — Yanille (no requirement)
-    {"shop": "Aleck's Hunter Emporium", "location": "Yanille", "req": "None",
-     "items": [
-         {"item_id": 10025, "item_name": "Magic box", "shop_price": 720, "stock": 30},
-     ]},
+    {
+        "shop": "Aleck's Hunter Emporium",
+        "location": "Yanille",
+        "req": "None",
+        "items": [
+            {
+                "item_id": 10025,
+                "item_name": "Magic box",
+                "shop_price": 720,
+                "stock": 30,
+            },
+        ],
+    },
     # Darkmeyer Meat Shop — Darkmeyer (Sins of the Father + Vyre noble clothing)
-    {"shop": "Darkmeyer Meat Shop", "location": "Darkmeyer", "req": "Sins of the Father + Vyre clothing",
-     "items": [
-         {"item_id": 24782, "item_name": "Raw mystery meat", "shop_price": 1, "stock": 25},
-         {"item_id": 2136,  "item_name": "Raw bear meat",    "shop_price": 1, "stock": 10},
-     ]},
+    {
+        "shop": "Darkmeyer Meat Shop",
+        "location": "Darkmeyer",
+        "req": "Sins of the Father + Vyre clothing",
+        "items": [
+            {
+                "item_id": 24782,
+                "item_name": "Raw mystery meat",
+                "shop_price": 1,
+                "stock": 25,
+            },
+            {
+                "item_id": 2136,
+                "item_name": "Raw bear meat",
+                "shop_price": 1,
+                "stock": 10,
+            },
+        ],
+    },
     # Aurel's Supplies — Burgh de Rott (In Aid of the Myreque)
-    {"shop": "Aurel's Supplies", "location": "Burgh de Rott", "req": "In Aid of the Myreque",
-     "items": [
-         {"item_id": 3363, "item_name": "Thin snail", "shop_price": 6, "stock": 10},
-     ]},
+    {
+        "shop": "Aurel's Supplies",
+        "location": "Burgh de Rott",
+        "req": "In Aid of the Myreque",
+        "items": [
+            {"item_id": 3363, "item_name": "Thin snail", "shop_price": 6, "stock": 10},
+        ],
+    },
     # Sawmill / Construction Supplies — Lumber Yard Varrock + 3 other locations (no req)
-    {"shop": "Sawmill Operator", "location": "Lumber Yard (Varrock) + 3 others", "req": "None",
-     "items": [
-         {"item_id": 1539, "item_name": "Steel nails", "shop_price": 3, "stock": 1000,
-          "notes": "4 world-hoppable shop locations"},
-     ]},
+    {
+        "shop": "Sawmill Operator",
+        "location": "Lumber Yard (Varrock) + 3 others",
+        "req": "None",
+        "items": [
+            {
+                "item_id": 1539,
+                "item_name": "Steel nails",
+                "shop_price": 3,
+                "stock": 1000,
+                "notes": "4 world-hoppable shop locations",
+            },
+        ],
+    },
     # Zaff's Superior Staffs! — Varrock (Varrock Diary for higher daily limits)
     # Daily allotment (personal per-account limit, not world-shared stock)
-    {"shop": "Zaff's Superior Staffs!", "location": "Varrock", "req": "Varrock Diary (any tier)",
-     "items": [
-         {"item_id": 1391, "item_name": "Battlestaff", "shop_price": 7000, "stock": 120,
-          "notes": "Daily personal limit: 15 (Easy) / 30 (Med) / 60 (Hard) / 120 (Elite diary)"},
-     ]},
+    {
+        "shop": "Zaff's Superior Staffs!",
+        "location": "Varrock",
+        "req": "Varrock Diary (any tier)",
+        "items": [
+            {
+                "item_id": 1391,
+                "item_name": "Battlestaff",
+                "shop_price": 7000,
+                "stock": 120,
+                "notes": "Daily personal limit: 15 (Easy) / 30 (Med) / 60 (Hard) / 120 (Elite diary)",
+            },
+        ],
+    },
 ]
 
 # Flatten shop data into a single list for the endpoint.
 SHOP_ITEMS = []
 for _shop in _SHOP_DATA:
     for _item in _shop["items"]:
-        SHOP_ITEMS.append({
-            "shop":       _shop["shop"],
-            "location":   _shop["location"],
-            "req":        _shop["req"],
-            "item_id":    _item["item_id"],
-            "item_name":  _item["item_name"],
-            "shop_price": _item["shop_price"],
-            "stock":      _item["stock"],
-            "notes":      _item.get("notes", ""),
-        })
+        SHOP_ITEMS.append(
+            {
+                "shop": _shop["shop"],
+                "location": _shop["location"],
+                "req": _shop["req"],
+                "item_id": _item["item_id"],
+                "item_name": _item["item_name"],
+                "shop_price": _item["shop_price"],
+                "stock": _item["stock"],
+                "notes": _item.get("notes", ""),
+            }
+        )
 
 _shops_cache: dict = {"payload": None, "ts": 0.0}
 SHOPS_TTL = 60  # refresh live GE prices every 60 s
@@ -1202,29 +1616,37 @@ def shops():
             tax = calculate_ge_tax_safe(ge_sell)
             net_sell = ge_sell - tax
             margin = net_sell - s["shop_price"]
-            roi = round((margin / s["shop_price"]) * 100, 1) if s["shop_price"] > 0 else None
+            roi = (
+                round((margin / s["shop_price"]) * 100, 1)
+                if s["shop_price"] > 0
+                else None
+            )
         else:
             tax = net_sell = margin = roi = None
 
-        results.append({
-            "shop":       s["shop"],
-            "location":   s["location"],
-            "req":        s["req"],
-            "itemId":     item_id,
-            "itemName":   s["item_name"],
-            "shopPrice":  s["shop_price"],
-            "stock":      s["stock"],
-            "notes":      s["notes"],
-            "geSell":     ge_sell,
-            "geHigh":     ge_high,
-            "tax":        tax,
-            "netSell":    net_sell,
-            "margin":     margin,
-            "roi":        roi,
-            "hourlyVolume": volume,
-        })
+        results.append(
+            {
+                "shop": s["shop"],
+                "location": s["location"],
+                "req": s["req"],
+                "itemId": item_id,
+                "itemName": s["item_name"],
+                "shopPrice": s["shop_price"],
+                "stock": s["stock"],
+                "notes": s["notes"],
+                "geSell": ge_sell,
+                "geHigh": ge_high,
+                "tax": tax,
+                "netSell": net_sell,
+                "margin": margin,
+                "roi": roi,
+                "hourlyVolume": volume,
+            }
+        )
 
-    results.sort(key=lambda r: r["margin"] if r["margin"] is not None else -999999, reverse=True)
+    results.sort(
+        key=lambda r: r["margin"] if r["margin"] is not None else -999999, reverse=True
+    )
     payload = {"items": results, "count": len(results)}
     _shops_cache["payload"] = payload
     _shops_cache["ts"] = now
@@ -1235,7 +1657,9 @@ def shops():
 def get_timeseries(item_id: int):
     timestep = request.args.get("timestep", "5m")
     if timestep not in VALID_TIMESTEPS:
-        return jsonify({"error": f"invalid timestep, must be one of {sorted(VALID_TIMESTEPS)}"}), 400
+        return jsonify(
+            {"error": f"invalid timestep, must be one of {sorted(VALID_TIMESTEPS)}"}
+        ), 400
     key = (item_id, timestep)
     now = time.time()
     cached = _ts_cache.get(key)
@@ -1488,39 +1912,37 @@ _OCR_PROMPT_INVENTORY = (
 )
 
 _OCR_PROMPT_ITEM_LIST = (
-    "This is a screenshot from a RuneLite plugin. Each row in the screenshot "
-    "is one OSRS item, presented in this strict left-to-right structure:\n\n"
-    "  [small item icon] [QUANTITY] [ITEM NAME] [GP VALUE]\n\n"
+    "This is a cropped screenshot from a RuneLite plugin. Each row contains "
+    "exactly ONE OSRS item, with the following left-to-right structure:\n\n"
+    "  [small item icon] [QUANTITY] [ITEM NAME]\n\n"
+    "There is NO gp-value or other trailing column in this crop — the row "
+    "ends at the item name.\n\n"
     "Parsing rules — apply these in order:\n\n"
-    "1. IGNORE THE ICON. The small image on the left of each row is just "
-    "decoration. Do NOT use it for identification — read the TEXT only.\n\n"
-    "2. The QUANTITY is the first block of digits on the row. It may contain "
-    "comma separators ('1,035'). Strip the commas; report it as an integer.\n\n"
-    "3. The ITEM NAME comes immediately after the quantity and a single space. "
-    "Critically, an item name NEVER starts with a digit and NEVER ends with a "
-    "digit. The name continues for one OR MORE words until the next block of "
-    "digits begins. Multi-word names are common (e.g. 'Dragon javelin tips', "
-    "'Steel warhammer', 'Iron platebody', 'Magic longbow (u)').\n\n"
-    "4. The GP VALUE is the LAST block of digits on the row (with comma "
-    "separators). You can ignore it — we only need quantity + name.\n\n"
-    "Worked examples, exactly as they appear in screenshots:\n"
-    "  '560 Diamond bracelet 1,136,800'\n"
-    "    → quantity=560, name='Diamond bracelet'\n"
-    "  '1,035 Runite bolts 99,360'\n"
-    "    → quantity=1035, name='Runite bolts'\n"
-    "  '300 Ironwood repair kit 647,700'\n"
-    "    → quantity=300, name='Ironwood repair kit'\n"
-    "  '900 Atlatl dart 128,960'\n"
-    "    → quantity=900, name='Atlatl dart'\n\n"
+    "1. IGNORE THE ICON. The small image on the left is decoration only. Do "
+    "NOT use it to identify the item — read the TEXT.\n\n"
+    "2. The QUANTITY is the leading block of digits on the row. It may include "
+    "comma separators (e.g. '1,035'). Strip the commas and report it as an integer.\n\n"
+    "3. The ITEM NAME is everything AFTER the quantity, all the way to the end "
+    "of the row. The boundary signal: item names ALWAYS begin with a letter, "
+    "never a digit. The moment you read the first letter on a row, the quantity "
+    "has ended and the name has begun. The name continues to end-of-row.\n\n"
+    "4. Multi-word names are common — don't truncate them. The whole text "
+    "string after the quantity is one item name.\n\n"
+    "Worked examples (rows as they appear in the screenshot):\n"
+    "  '560 Diamond bracelet'    → quantity=560,  name='Diamond bracelet'\n"
+    "  '1,035 Runite bolts'      → quantity=1035, name='Runite bolts'\n"
+    "  '300 Ironwood repair kit' → quantity=300,  name='Ironwood repair kit'\n"
+    "  '900 Atlatl dart'         → quantity=900,  name='Atlatl dart'\n"
+    "  '1,030 Yew longbow (u)'   → quantity=1030, name='Yew longbow (u)'\n\n"
     "Common mistakes to avoid:\n"
-    " - Don't truncate multi-word names ('Dragon javelin tips' is one name, not 'Dragon').\n"
-    " - Don't merge two rows together. Each row ends at its own gp-value; the "
-    "next row's quantity is unrelated.\n"
-    " - The visual gap between QUANTITY and NAME can be narrow — but the name "
-    "always begins with a letter, so use that boundary cue.\n\n"
+    " - Don't truncate multi-word names — 'Dragon javelin tips' is one name, "
+    "not 'Dragon'. Read all the way to end-of-row.\n"
+    " - Don't merge two rows together. Each row contains exactly one item.\n"
+    " - The visual gap between QUANTITY and NAME can be narrow — use the "
+    "letter-after-digits boundary cue.\n\n"
     "For each visible row return via the report_inventory tool:\n"
     "  - slot: 1-based row number from the top (row 1 = topmost)\n"
-    "  - name: the exact item name (between the two number blocks)\n"
+    "  - name: the exact item name (everything after the leading quantity)\n"
     "  - quantity: the leading number as an integer (strip commas)\n"
     "  - confidence: high if both quantity and name are clearly legible.\n\n"
     "Skip rows that are headers, footers, or summary totals — only return "
@@ -1533,7 +1955,7 @@ def _build_ocr_prompt(expected_items, fmt="inventory"):
     constrained by the user's running-list "answer key".
 
     fmt: 'inventory' (4×7 OSRS bag icons) or 'item_list' (RuneLite plugin
-    text rows like "560 Diamond bracelet 1,136,800").
+    text rows like "560 Diamond bracelet").
 
     Answer-key handling differs by format:
     - inventory: hard constraint. Model picks from the list because raw icon
@@ -1575,13 +1997,20 @@ def _build_ocr_prompt(expected_items, fmt="inventory"):
 @app.route("/api/ocr/status")
 def ocr_status():
     """Frontend probe — tells the UI whether OCR is available."""
-    return jsonify({"enabled": _ocr_enabled(), "model": ANTHROPIC_MODEL if _ocr_enabled() else None})
+    return jsonify(
+        {
+            "enabled": _ocr_enabled(),
+            "model": ANTHROPIC_MODEL if _ocr_enabled() else None,
+        }
+    )
 
 
 @app.route("/api/ocr/inventory", methods=["POST"])
 def ocr_inventory():
     if not _ocr_enabled():
-        return jsonify({"error": "OCR not configured on this server (set ANTHROPIC_API_KEY)"}), 503
+        return jsonify(
+            {"error": "OCR not configured on this server (set ANTHROPIC_API_KEY)"}
+        ), 503
 
     body = request.get_json(silent=True) or {}
     image_b64 = body.get("image")
@@ -1645,7 +2074,10 @@ def ocr_inventory():
 
     # Pull the tool_use block out. There should be exactly one given we forced tool_choice.
     for block in resp.content:
-        if getattr(block, "type", None) == "tool_use" and block.name == "report_inventory":
+        if (
+            getattr(block, "type", None) == "tool_use"
+            and block.name == "report_inventory"
+        ):
             return jsonify(
                 {
                     "items": block.input.get("items", []),
