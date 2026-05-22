@@ -1530,16 +1530,37 @@ _OCR_PROMPT_ITEM_LIST = (
 
 def _build_ocr_prompt(expected_items, fmt="inventory"):
     """Build the OCR prompt for the selected screenshot format, optionally
-    constrained by the user's running-list "answer key" so the model picks
-    item names from a known set instead of guessing.
+    constrained by the user's running-list "answer key".
 
     fmt: 'inventory' (4×7 OSRS bag icons) or 'item_list' (RuneLite plugin
     text rows like "560 Diamond bracelet 1,136,800").
+
+    Answer-key handling differs by format:
+    - inventory: hard constraint. Model picks from the list because raw icon
+      identification is unreliable.
+    - item_list: soft hint only. The names are already in the image as text,
+      so the model should transcribe what it sees. The list is included to
+      help normalize ambiguous OCR (e.g., 'Drag0n' → 'Dragon') but explicitly
+      NOT as a "fill in from here when stuck" source — that causes the model
+      to hallucinate duplicate rows when text is hard to read.
     """
     base = _OCR_PROMPT_ITEM_LIST if fmt == "item_list" else _OCR_PROMPT_INVENTORY
     if not expected_items:
         return base
     bullet_list = "\n".join(f"  - {name}" for name in expected_items if name)
+    if fmt == "item_list":
+        return (
+            base
+            + "\n\nFor reference only, the user typically tracks the following items. "
+            + "Use this list ONLY to disambiguate when OCR is uncertain — e.g., if "
+            + "you read 'Drag0n javelin tips' you can correct to 'Dragon javelin tips'. "
+            + "DO NOT pull names from this list when text is unreadable; instead mark "
+            + "the row 'low' confidence and report what you actually see. NEVER report "
+            + "the same item name twice unless the screenshot literally shows the same "
+            + "name on two separate rows.\n"
+            + bullet_list
+        )
+    # inventory mode — original answer-key behavior
     return (
         base
         + "\n\nThe user is actively cycling the following items at Martin Thwait's shop. "
@@ -1597,6 +1618,9 @@ def ocr_inventory():
         resp = client.messages.create(
             model=ANTHROPIC_MODEL,
             max_tokens=4096,
+            # temperature=0 makes structured output deterministic and discourages
+            # the model from "creative completion" when it can't read clearly.
+            temperature=0,
             tools=[_OCR_TOOL_SCHEMA],
             tool_choice={"type": "tool", "name": "report_inventory"},
             messages=[
