@@ -256,9 +256,12 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
   };
 
   // Build a per-extracted-row review entry with matched id (if any).
+  // Sort by slot so the UI ordering matches how the user reads their
+  // screenshot (top-left to bottom-right). This makes it easy to spot
+  // mis-pairings visually.
   const ocrReview = useMemo(() => {
     if (!ocrResult?.items) return [];
-    return ocrResult.items.map((entry, idx) => {
+    const list = ocrResult.items.map((entry, idx) => {
       const match = matchToListItem(entry.name);
       return {
         idx,
@@ -269,6 +272,11 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
         matchedId: match?.id ?? null,
         matchedName: match?.name ?? null,
       };
+    });
+    return list.sort((a, b) => {
+      const sa = a.slot ?? 999;
+      const sb = b.slot ?? 999;
+      return sa - sb;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ocrResult, items]);
@@ -409,9 +417,16 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
                     <strong>Extracted {ocrReview.length} items</strong>
                     {' '} (model: {ocrResult.model}, {ocrResult.inputTokens}+{ocrResult.outputTokens} tokens)
                   </div>
+                  <p style={{ fontSize: '0.85em', color: 'var(--muted)', marginBottom: '0.4em' }}>
+                    Rows are ordered by slot (top-left = slot 1). Compare each row to
+                    your screenshot to verify the pairing — if a quantity looks wrong
+                    for an item, the OCR likely mis-paired it with a neighbor's number.
+                    Drop those rows before applying.
+                  </p>
                   <table className="alch-table bounded-table">
                     <thead>
                       <tr>
+                        <th className="right">Slot</th>
                         <th className="left">Extracted name</th>
                         <th className="right">Qty</th>
                         <th className="left">Match in running list</th>
@@ -421,6 +436,9 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
                     <tbody>
                       {ocrReview.map((r) => (
                         <tr key={r.idx}>
+                          <td className="right" style={{ color: 'var(--muted)' }}>
+                            {r.slot ?? '?'}
+                          </td>
                           <td className="left">{r.name}</td>
                           <td className="right">{r.quantity.toLocaleString()}</td>
                           <td

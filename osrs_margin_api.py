@@ -1442,9 +1442,12 @@ _OCR_TOOL_SCHEMA = {
                         "slot": {
                             "type": "integer",
                             "description": (
-                                "1-indexed inventory slot (1-28), left to right, top to bottom. "
-                                "Optional — include only if you can clearly determine position."
+                                "Required. 1-indexed inventory slot (1-28), left "
+                                "to right, top to bottom. Slot 1 is top-left, slot "
+                                "28 is bottom-right."
                             ),
+                            "minimum": 1,
+                            "maximum": 28,
                         },
                         "confidence": {
                             "type": "string",
@@ -1456,7 +1459,7 @@ _OCR_TOOL_SCHEMA = {
                             ),
                         },
                     },
-                    "required": ["name", "quantity"],
+                    "required": ["slot", "name", "quantity"],
                 },
             },
         },
@@ -1465,13 +1468,23 @@ _OCR_TOOL_SCHEMA = {
 }
 
 _OCR_PROMPT_BASE = (
-    "This is a screenshot of an Old School RuneScape inventory. "
-    "For every visible item, return its name and stack quantity via the "
-    "report_inventory tool. Use exact OSRS item names so they match GE listings. "
-    "Expand abbreviated numbers (10K, 1.5M, 1B). If an item icon has no visible "
-    "stack number, the quantity is 1. Mark each entry's confidence based on "
-    "icon clarity and number legibility. Do not invent items — only report "
-    "what you can actually see."
+    "This is a screenshot of an Old School RuneScape inventory — a 4-column × "
+    "7-row grid of 28 slots.\n\n"
+    "Walk through the slots in STRICT reading order: slot 1 = top-left, slot 2 = "
+    "next column to its right, slot 3 = next, slot 4 = top-right; then slot 5 = "
+    "leftmost of row 2, etc. Slot 28 = bottom-right.\n\n"
+    "For each occupied slot, return via the report_inventory tool:\n"
+    "  - slot: the slot number (1-28)\n"
+    "  - name: the exact OSRS item name\n"
+    "  - quantity: the integer printed in the TOP-LEFT corner of THAT slot's "
+    "icon. If no number is shown, the quantity is 1. Expand abbreviations: "
+    "10K → 10000, 1.5M → 1500000, 1B → 1000000000.\n"
+    "  - confidence: high / medium / low based on icon and number clarity.\n\n"
+    "CRITICAL: the quantity reported for a slot must be the number displayed "
+    "ON THAT SPECIFIC SLOT'S icon. The most common failure mode is mis-pairing "
+    "items with quantities from neighboring slots. Look at each slot in "
+    "isolation; finish slot N before moving to slot N+1.\n\n"
+    "Skip empty slots — return only occupied ones. Do not invent items."
 )
 
 
