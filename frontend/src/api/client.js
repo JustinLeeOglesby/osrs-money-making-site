@@ -17,7 +17,7 @@ export const fetchTimeseries = (itemId, timestep) =>
   getJSON(`/api/timeseries/${itemId}?timestep=${timestep}`);
 export const fetchShops = () => getJSON('/api/shops');
 export const fetchOcrStatus = () => getJSON('/api/ocr/status');
-export const ocrInventory = (imageBase64, mediaType, expectedItems = []) =>
+export const ocrInventory = (imageBase64, mediaType, expectedItems = [], format = 'inventory') =>
   getJSON('/api/ocr/inventory', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -25,5 +25,6 @@ export const ocrInventory = (imageBase64, mediaType, expectedItems = []) =>
       image: imageBase64,
       media_type: mediaType,
       expectedItems,
+      format,
     }),
   });

@@ -59,6 +59,9 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
   const [ocrResult, setOcrResult] = useState(null);       // {items, model, ...}
   const [ocrError, setOcrError] = useState(null);
   const [ocrShowRaw, setOcrShowRaw] = useState(false);    // raw JSON debug
+  // 'item_list' (default) = text list from a RuneLite plugin — easier to OCR,
+  // virtually error-free. 'inventory' = OSRS 4×7 bag icon grid.
+  const [ocrFormat, setOcrFormat] = useState('item_list');
 
   useEffect(() => {
     let cancelled = false;
@@ -231,7 +234,7 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
       // Pass the running-list item names so Claude can "pick from this list"
       // instead of guessing from the icon. Major accuracy win.
       const expected = items.map((it) => it.name).filter(Boolean);
-      const data = await ocrInventory(b64, ocrMediaType || 'image/png', expected);
+      const data = await ocrInventory(b64, ocrMediaType || 'image/png', expected, ocrFormat);
       setOcrResult(data);
     } catch (err) {
       setOcrError(err.message || 'OCR failed');
@@ -400,6 +403,25 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
                 {(ocrPreview || ocrResult) && (
                   <button className="range-btn" onClick={clearOcr}>Clear</button>
                 )}
+              </div>
+              <div className="ocr-controls" style={{ marginTop: '0.4em' }}>
+                <span style={{ color: 'var(--muted)', fontSize: '0.85em' }}>
+                  Screenshot format:
+                </span>
+                <button
+                  className={`range-btn ${ocrFormat === 'item_list' ? 'active' : ''}`}
+                  onClick={() => setOcrFormat('item_list')}
+                  title="RuneLite plugin output: text rows of 'quantity ItemName gpValue'. Much more accurate."
+                >
+                  📋 RuneLite item list
+                </button>
+                <button
+                  className={`range-btn ${ocrFormat === 'inventory' ? 'active' : ''}`}
+                  onClick={() => setOcrFormat('inventory')}
+                  title="OSRS bag icon grid (4×7). Relies on icon recognition — less reliable."
+                >
+                  🎒 Inventory icons
+                </button>
               </div>
               {ocrPreview && (
                 <div className="ocr-preview-wrap">

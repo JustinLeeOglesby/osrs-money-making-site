@@ -1467,7 +1467,7 @@ _OCR_TOOL_SCHEMA = {
     },
 }
 
-_OCR_PROMPT_BASE = (
+_OCR_PROMPT_INVENTORY = (
     "This is a screenshot of an Old School RuneScape inventory — a 4-column × "
     "7-row grid of 28 slots.\n\n"
     "Walk through the slots in STRICT reading order: slot 1 = top-left, slot 2 = "
@@ -1487,18 +1487,41 @@ _OCR_PROMPT_BASE = (
     "Skip empty slots — return only occupied ones. Do not invent items."
 )
 
+_OCR_PROMPT_ITEM_LIST = (
+    "This is a screenshot from a RuneLite plugin showing a list of OSRS items, "
+    "with one item per row. Each row follows this format:\n"
+    "  <quantity> <item-name> <gp-value>\n"
+    "For example: '560 Diamond bracelet 1,136,800' means quantity=560, "
+    "name='Diamond bracelet', gp-value=1,136,800 (which you can ignore — we "
+    "only care about quantity and name).\n\n"
+    "Quantities and gp-values may include comma separators (e.g. '1,035'). "
+    "Strip the commas and report the quantity as a plain integer. Names can "
+    "be multi-word.\n\n"
+    "Read every visible row. For each row return via report_inventory:\n"
+    "  - slot: the 1-based row number from the top of the list\n"
+    "  - name: the exact item name as written\n"
+    "  - quantity: the leading number as an integer\n"
+    "  - confidence: high if the text is sharp and unambiguous; medium/low if "
+    "any character was hard to read.\n\n"
+    "Don't include rows from headers, footers, or summary totals — only "
+    "individual item rows. Do not invent items."
+)
 
-def _build_ocr_prompt(expected_items):
-    """Append an "answer key" of likely items to the prompt when the frontend
-    passes its running list. This dramatically improves item identification —
-    Claude no longer has to guess from icon alone; it picks the closest match
-    from a constrained set of N items the user is actually tracking.
+
+def _build_ocr_prompt(expected_items, fmt="inventory"):
+    """Build the OCR prompt for the selected screenshot format, optionally
+    constrained by the user's running-list "answer key" so the model picks
+    item names from a known set instead of guessing.
+
+    fmt: 'inventory' (4×7 OSRS bag icons) or 'item_list' (RuneLite plugin
+    text rows like "560 Diamond bracelet 1,136,800").
     """
+    base = _OCR_PROMPT_ITEM_LIST if fmt == "item_list" else _OCR_PROMPT_INVENTORY
     if not expected_items:
-        return _OCR_PROMPT_BASE
+        return base
     bullet_list = "\n".join(f"  - {name}" for name in expected_items if name)
     return (
-        _OCR_PROMPT_BASE
+        base
         + "\n\nThe user is actively cycling the following items at Martin Thwait's shop. "
         + "Most or all items visible in the screenshot should match one of these — "
         + "use the EXACT name from this list when an item matches:\n"
@@ -1544,7 +1567,10 @@ def ocr_inventory():
         expected_items = []
     # Cap the list to keep the prompt reasonable.
     expected_items = [str(s) for s in expected_items[:60] if isinstance(s, str)]
-    prompt_text = _build_ocr_prompt(expected_items)
+    fmt = body.get("format") or "inventory"
+    if fmt not in ("inventory", "item_list"):
+        fmt = "inventory"
+    prompt_text = _build_ocr_prompt(expected_items, fmt=fmt)
 
     client = _get_anthropic()
     try:
