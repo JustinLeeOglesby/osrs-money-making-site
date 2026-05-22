@@ -29,6 +29,16 @@ function parseInt0(v) {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
+// Parse a comma-tolerant numeric input. Returns null for empty/invalid
+// (used to clear the override), otherwise a non-negative integer.
+function parseGpOrNull(v) {
+  if (v == null || v === '') return null;
+  const cleaned = String(v).replace(/[,_\s]/g, '');
+  if (!cleaned) return null;
+  const n = Math.floor(Number(cleaned));
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
 // Rogues' Den Running List.
 //
 // The user's curated, stable pool of items they cycle through Martin Thwait's
@@ -181,6 +191,23 @@ export default function RoguesListTab() {
   // the global default from lab settings.
   const effectiveN = (id) => stocks[id]?.n ?? maxSells;
 
+  // Buy-price override: lets the user pin a price manually when the live
+  // GE data is missing/stale/wrong, so the profit math reflects what they
+  // actually paid (or what they realistically can buy at).
+  // Empty input clears the override and we fall back to live buyPrice.
+  const updateItemBuyOverride = (id, val) => {
+    setStocks((prev) => {
+      const current = prev[id] || {};
+      const parsed = parseGpOrNull(val);
+      if (parsed == null) {
+        // Clear the override field; keep qty/n intact.
+        const { buyOverride: _drop, ...rest } = current;
+        return { ...prev, [id]: rest };
+      }
+      return { ...prev, [id]: { ...current, buyOverride: parsed } };
+    });
+  };
+
   const load = () => {
     setRefreshing(true);
     setError(null);
@@ -205,8 +232,12 @@ export default function RoguesListTab() {
     return listItems.map((it) => {
       const live = byId.get(it.id);
       const n = stocks[it.id]?.n ?? maxSells;
-      const metrics = live
-        ? computeRoguesMetrics(live.highalch, live.buyPrice, n, live.dailyVolumePerHr || 0)
+      const override = stocks[it.id]?.buyOverride;
+      // Effective buy price feeds all the math. If the user has overridden,
+      // their value wins; otherwise live wins; otherwise null (no math).
+      const effectiveBuyPrice = override ?? live?.buyPrice ?? null;
+      const metrics = live && live.highalch && effectiveBuyPrice
+        ? computeRoguesMetrics(live.highalch, effectiveBuyPrice, n, live.dailyVolumePerHr || 0)
         : null;
       return {
         id: it.id,
@@ -214,7 +245,9 @@ export default function RoguesListTab() {
         live,
         metrics,
         n,
-        status: statusFor(live, n, anomalyPct),
+        buyPrice: effectiveBuyPrice,
+        buyOverride: override ?? null,
+        status: statusFor({ ...live, buyPrice: effectiveBuyPrice }, n, anomalyPct),
       };
     });
   }, [listItems, byId, stocks, maxSells, anomalyPct]);
@@ -373,6 +406,7 @@ export default function RoguesListTab() {
         )}
         onRowClick={(row) => openItemModal(row.id)}
         onUpdateN={updateItemN}
+        onUpdateBuyOverride={updateItemBuyOverride}
       />
 
       {/* === Stock equalizer (collapsible) === */}
@@ -432,7 +466,7 @@ export default function RoguesListTab() {
 // Pool table: the user's running list
 // ---------------------------------------------------------------------------
 
-function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN }) {
+function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN, onUpdateBuyOverride }) {
   // Default sort: by profit/session descending so the highest-margin picks
   // float to the top.
   const [sortKey, setSortKey] = useState('profit');
@@ -444,7 +478,9 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN })
     switch (key) {
       case 'name':         return (r.name || '').toLowerCase();
       case 'limit':        return live?.limit ?? -1;
-      case 'buyPrice':     return live?.buyPrice ?? -1;
+      // Use the row's effective buy price (override > live) for sorting,
+      // so manually-priced items sort alongside everything else correctly.
+      case 'buyPrice':     return r.buyPrice ?? -1;
       case 'n':            return r.n ?? 0;
       case 'profit':       return m?.profitPerSession ?? -Infinity;
       case 'dailyCeiling': {
@@ -518,10 +554,10 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN })
             </tr>
           )}
           {sorted.map((row) => {
-            const { id, name, live, metrics, status, n } = row;
+            const { id, name, live, metrics, status, n, buyPrice, buyOverride } = row;
             const profit = metrics?.profitPerSession ?? 0;
             const buyLimit = live?.limit ?? null;
-            const buyPrice = live?.buyPrice ?? null;
+            const livePrice = live?.buyPrice ?? null;
             const dailyCeiling = buyLimit && metrics && metrics.sellsPerSession
               ? (metrics.profitPerSession / metrics.sellsPerSession) * buyLimit * 4
               : null;
@@ -534,7 +570,32 @@ function PoolTable({ rows, emptyMessage, renderActions, onRowClick, onUpdateN })
                 </td>
                 <td className="left">{name}</td>
                 <td className="right">{buyLimit?.toLocaleString() ?? '—'}</td>
-                <td className="right">{buyPrice != null ? fmtGp(buyPrice) : '—'}</td>
+                <td className="right" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="text"
+                    value={buyOverride != null ? buyOverride : ''}
+                    placeholder={livePrice != null ? livePrice.toLocaleString() : '—'}
+                    onChange={(e) => onUpdateBuyOverride(id, e.target.value)}
+                    inputMode="numeric"
+                    title={
+                      buyOverride != null
+                        ? `Manual override: ${buyOverride.toLocaleString()} gp (live: ${livePrice != null ? livePrice.toLocaleString() : 'n/a'}). Clear to revert.`
+                        : 'Override the buy price for this row when live data is missing or stale. Empty = use live price.'
+                    }
+                    style={{
+                      width: '6em',
+                      textAlign: 'right',
+                      background: 'var(--bg)',
+                      color: buyOverride != null ? '#f3c54a' : 'var(--text)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 3,
+                      padding: '0.15em 0.4em',
+                      fontFamily: 'inherit',
+                      fontSize: '0.95em',
+                      fontStyle: buyOverride != null ? 'italic' : 'normal',
+                    }}
+                  />
+                </td>
                 <td className="right" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="text"
