@@ -53,6 +53,7 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
   const [ocrExtracting, setOcrExtracting] = useState(false);
   const [ocrResult, setOcrResult] = useState(null);       // {items, model, ...}
   const [ocrError, setOcrError] = useState(null);
+  const [ocrShowRaw, setOcrShowRaw] = useState(false);    // raw JSON debug
 
   useEffect(() => {
     let cancelled = false;
@@ -174,7 +175,10 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
     try {
       // Strip "data:image/png;base64," prefix; backend re-adds expected wrapping.
       const b64 = ocrPreview.split(',', 2)[1] || '';
-      const data = await ocrInventory(b64, ocrMediaType || 'image/png');
+      // Pass the running-list item names so Claude can "pick from this list"
+      // instead of guessing from the icon. Major accuracy win.
+      const expected = items.map((it) => it.name).filter(Boolean);
+      const data = await ocrInventory(b64, ocrMediaType || 'image/png', expected);
       setOcrResult(data);
     } catch (err) {
       setOcrError(err.message || 'OCR failed');
@@ -382,7 +386,7 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
                       ))}
                     </tbody>
                   </table>
-                  <div style={{ marginTop: '0.6em', display: 'flex', gap: '0.4em' }}>
+                  <div style={{ marginTop: '0.6em', display: 'flex', gap: '0.4em', flexWrap: 'wrap' }}>
                     <button
                       className="range-btn"
                       onClick={applyOcrToStocks}
@@ -390,10 +394,34 @@ export default function StockEqualizer({ items, byId, defaultSellsPerSession = 2
                     >
                       Apply quantities to equalizer
                     </button>
+                    <button
+                      className={`range-btn ${ocrShowRaw ? 'active' : ''}`}
+                      onClick={() => setOcrShowRaw((v) => !v)}
+                      title="Show the raw JSON Claude returned. Useful when item identification is off."
+                    >
+                      {ocrShowRaw ? 'Hide' : 'Show'} raw response
+                    </button>
                     <span style={{ alignSelf: 'center', color: 'var(--muted)', fontSize: '0.85em' }}>
                       Only matched items fill in; unmatched rows are ignored.
                     </span>
                   </div>
+                  {ocrShowRaw && (
+                    <pre
+                      style={{
+                        marginTop: '0.6em',
+                        padding: '0.6em 0.8em',
+                        background: 'var(--bg)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 4,
+                        fontSize: '0.78em',
+                        overflowX: 'auto',
+                        maxHeight: '300px',
+                        overflowY: 'auto',
+                      }}
+                    >
+                      {JSON.stringify(ocrResult, null, 2)}
+                    </pre>
+                  )}
                 </div>
               )}
             </div>

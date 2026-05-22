@@ -1464,7 +1464,7 @@ _OCR_TOOL_SCHEMA = {
     },
 }
 
-_OCR_PROMPT = (
+_OCR_PROMPT_BASE = (
     "This is a screenshot of an Old School RuneScape inventory. "
     "For every visible item, return its name and stack quantity via the "
     "report_inventory tool. Use exact OSRS item names so they match GE listings. "
@@ -1473,6 +1473,26 @@ _OCR_PROMPT = (
     "icon clarity and number legibility. Do not invent items — only report "
     "what you can actually see."
 )
+
+
+def _build_ocr_prompt(expected_items):
+    """Append an "answer key" of likely items to the prompt when the frontend
+    passes its running list. This dramatically improves item identification —
+    Claude no longer has to guess from icon alone; it picks the closest match
+    from a constrained set of N items the user is actually tracking.
+    """
+    if not expected_items:
+        return _OCR_PROMPT_BASE
+    bullet_list = "\n".join(f"  - {name}" for name in expected_items if name)
+    return (
+        _OCR_PROMPT_BASE
+        + "\n\nThe user is actively cycling the following items at Martin Thwait's shop. "
+        + "Most or all items visible in the screenshot should match one of these — "
+        + "use the EXACT name from this list when an item matches:\n"
+        + bullet_list
+        + "\n\nIf you see an item that's clearly NOT on this list, return its actual OSRS "
+        + "name and mark confidence as 'low'."
+    )
 
 
 @app.route("/api/ocr/status")
@@ -1503,6 +1523,16 @@ def ocr_inventory():
     if media_type not in ("image/png", "image/jpeg", "image/webp", "image/gif"):
         return jsonify({"error": f"unsupported media type: {media_type}"}), 400
 
+    # Optional list of item names the user is actively tracking. When present,
+    # we use it as an answer-key for Claude — the model picks from a known
+    # 27-item set instead of guessing from icon alone. Big accuracy win.
+    expected_items = body.get("expectedItems") or []
+    if not isinstance(expected_items, list):
+        expected_items = []
+    # Cap the list to keep the prompt reasonable.
+    expected_items = [str(s) for s in expected_items[:60] if isinstance(s, str)]
+    prompt_text = _build_ocr_prompt(expected_items)
+
     client = _get_anthropic()
     try:
         resp = client.messages.create(
@@ -1522,7 +1552,7 @@ def ocr_inventory():
                                 "data": image_b64,
                             },
                         },
-                        {"type": "text", "text": _OCR_PROMPT},
+                        {"type": "text", "text": prompt_text},
                     ],
                 }
             ],
